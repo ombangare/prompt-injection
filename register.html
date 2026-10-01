@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register — PROMPT://INJECTION</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- CRT Overlay & 3D Matrix -->
+  <div class="crt-overlay"></div>
+  <canvas id="matrix-bg"></canvas>
+  <div id="three-bg"></div>
+  <div class="vignette"></div>
+
+  <!-- BIOHAZARD TICKER -->
+  <div class="biohazard-bar">
+    <div class="biohazard-track">
+      <span>⚠️ CLEARANCE PORTAL // AI GENX CLUB</span>
+      <span>• ROUND 1: 09 OCT 2026 • ROUND 2: 12 OCT 2026</span>
+      <span>• LIMITED PARTICIPANT ACCESS SLOTS</span>
+      <span>⚠️ CLEARANCE PORTAL // AI GENX CLUB</span>
+      <span>• ROUND 1: 09 OCT 2026 • ROUND 2: 12 OCT 2026</span>
+    </div>
+  </div>
+
+  <header class="site-nav">
+    <a href="index.html" class="nav-logo">
+      <span class="dot">&gt;</span>PROMPT<span style="color:var(--ink-faint)">://</span>INJECTION
+    </a>
+
+    <div class="nav-controls">
+      <button id="audio-toggle-btn" class="hud-btn active" title="Toggle Horror Audio Synthesizer">
+        <div class="eq-bars"><span></span><span></span><span></span></div>
+        <span id="audio-status-text">SOUND: ONLINE</span>
+      </button>
+      <button id="crt-toggle-btn" class="hud-btn active" title="Toggle CRT Retro Filter">
+        <span class="crt-label">CRT: ON</span>
+      </button>
+    </div>
+
+    <button class="nav-toggle" aria-label="Toggle menu">☰</button>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="index.html#rounds">Rounds</a>
+      <a href="team.html">Team</a>
+      <a href="help.html">Help</a>
+      <a href="register.html" class="cta active">Register</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="page-head reveal">
+      <div class="file-tag red"><span class="pulse"></span>FILE_04 — ACCESS CLEARANCE GATEWAY</div>
+      <h1>Request Security Clearance</h1>
+      <p>Submit your credentials below to lock your slot before registration closes on <strong>07 Oct 2026, 1:00 PM</strong>. Qualifiers advance through the 3-round breach protocol.</p>
+    </div>
+
+    <div class="reg-wrap">
+      <div class="reg-notes reveal">
+        <h3>Official Timeline &amp; Protocol</h3>
+        <ul>
+          <li><strong>Last day to register:</strong> 07 Oct, 1:00 PM</li>
+          <li><strong>Photos Release &amp; Round 1:</strong> 07 Oct, 4:00 PM (Online)</li>
+          <li><strong>Round 1 Ends:</strong> 08 Oct, 6:00 PM</li>
+          <li><strong>Round 1 Results:</strong> 09 Oct, 8:00 PM (30 Shortlisted)</li>
+          <li><strong>Round 2 (In-College Build):</strong> 10 Oct, 10:00 AM – 1:30 PM (5 Themes)</li>
+          <li><strong>Round 2 Results:</strong> 11 Oct, 4:00 PM (10 Shortlisted)</li>
+          <li><strong>Round 3 (Main Event Finals):</strong> 12 Oct, 11:00 AM Onwards</li>
+        </ul>
+
+        <h3 style="margin-top:24px;">Need Assistance?</h3>
+        <p style="color:var(--ink-dim);font-size:.88rem;">
+          Consult the <a href="help.html" style="color:var(--green);font-weight:700;">Support &amp; FAQ</a> before submitting.
+        </p>
+      </div>
+
+      <form class="reg-form reveal" id="reg-form">
+        <div style="padding:10px 14px;background:rgba(25,255,110,0.08);border:1px solid rgba(25,255,110,0.3);border-radius:4px;font-size:0.82rem;color:var(--green);display:flex;align-items:center;gap:8px;">
+          <span class="pulse" style="width:6px;height:6px;background:var(--green);border-radius:50%;"></span>
+          <span>REGISTERING FOR: <strong>ROUND 1 (ONLINE QUALIFIER)</strong></span>
+        </div>
+
+        <div class="field">
+          <label for="fullname">1. Full Name *</label>
+          <input id="fullname" name="fullname" type="text" placeholder="e.g. Alex Mercer" required>
+        </div>
+
+        <div class="field">
+          <label for="phone">2. WhatsApp / Contact Number *</label>
+          <input id="phone" name="phone" type="tel" placeholder="e.g. +91 9876543210 (For WhatsApp Group & Updates)" required>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label for="branch">3. Department / Branch *</label>
+            <input id="branch" name="branch" type="text" placeholder="e.g. AI & Data Science / CSE / IT" required>
+          </div>
+          <div class="field">
+            <label for="year">4. Academic Year *</label>
+            <select id="year" name="year" required>
+              <option value="" disabled selected>Select Year</option>
+              <option value="1st Year">1st Year</option>
+              <option value="2nd Year">2nd Year</option>
+              <option value="3rd Year">3rd Year</option>
+              <option value="4th Year">4th Year</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:8px;">
+          <span>CONFIRM ROUND 1 REGISTRATION &rarr;</span>
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <!-- 3D HOLOGRAPHIC ACCESS PASS & WHATSAPP JOIN MODAL -->
+  <div id="reg-pass-modal">
+    <div class="pass-card-3d" style="max-width:560px;border:2px solid var(--green);">
+      <div class="pass-header" style="border-bottom:1px solid rgba(25,255,110,0.4);">
+        <div>
+          <div style="font-size:0.75rem;color:var(--green);letter-spacing:0.15em;font-weight:700;">SECURITY CLEARANCE GRANTED // ROUND 1 ENTRY LOGGED</div>
+          <div class="pass-id" id="pass-ticket-id" style="color:#fff;font-size:1.4rem;">GENX-R1-2026</div>
+        </div>
+        <div style="font-size:1.6rem;">🟢</div>
+      </div>
+
+      <!-- WHATSAPP COMMUNITY CARD -->
+      <div style="background:linear-gradient(135deg, rgba(7,31,16,0.95), rgba(4,18,10,0.98));border:2px solid var(--green);border-radius:8px;padding:16px;margin:1rem 0;box-shadow:0 0 25px rgba(25,255,110,0.3);text-align:center;">
+        <div style="display:inline-flex;align-items:center;gap:6px;color:var(--green);font-size:0.75rem;font-weight:700;letter-spacing:0.12em;margin-bottom:6px;">
+          <span class="pulse" style="width:8px;height:8px;background:var(--green);border-radius:50%;"></span>
+          FINAL STEP // MANDATORY PARTICIPANT COMMUNITY
+        </div>
+        <h3 style="color:#fff;font-size:1.15rem;margin:4px 0 8px 0;">Join The Official Event WhatsApp Group</h3>
+        <p style="color:var(--ink-dim);font-size:0.84rem;margin:0 0 14px 0;line-height:1.5;">
+          Round 1 secret AI photos, prompt reverse-engineering rules, and submission forms will be released directly inside this group on <strong>07 Oct, 4:00 PM</strong>.
+        </p>
+
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <a id="wa-join-btn" href="https://chat.whatsapp.com/KC7sl7IXIEF0hxGasxXIPG" target="_blank" rel="noopener" class="btn btn-green" style="flex:1;min-width:200px;padding:0.9em 1.4em;">
+            <span>📲 TAP TO JOIN WHATSAPP GROUP</span>
+          </a>
+        </div>
+      </div>
+
+      <div style="background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.08);padding:12px 14px;border-radius:6px;font-size:0.82rem;color:var(--ink-dim);line-height:1.6;">
+        <div>OPERATIVE: <strong style="color:#fff;" id="pass-name">ALEX MERCER</strong></div>
+        <div>CONTACT: <strong style="color:#fff;" id="pass-phone">+91 XXXXX XXXXX</strong></div>
+        <div>DEPARTMENT: <strong style="color:#fff;" id="pass-branch">COMPUTER SCIENCE</strong> (<span id="pass-year">1st Year</span>)</div>
+        <div>STAGE_01 (ONLINE): <strong style="color:var(--green)">07 OCT, 4:00 PM</strong></div>
+        <div style="margin-top:8px;padding-top:8px;border-top:1px dashed rgba(255,255,255,0.1);color:var(--amber);font-size:0.78rem;">
+          🔒 <em>Official In-Campus Entry Passes will be unlocked for the Top 30 Shortlisted candidates who qualify Round 1 (Results: 09 Oct, 8:00 PM).</em>
+        </div>
+      </div>
+
+      <div style="margin-top:18px;text-align:center;">
+        <button class="btn btn-ghost" onclick="document.getElementById('reg-pass-modal').classList.remove('active')" style="width:100%;padding:0.85em;">
+          DONE / CLOSE
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-top">
+      <div>
+        <div class="f-brand">PROMPT<span style="color:var(--red)">://</span>INJECTION</div>
+        <p style="color:var(--ink-dim);font-size:0.85rem;margin-top:0.8rem;max-width:320px;">
+          Organized by <strong>AI GenX Club</strong>. Flagship 2026.
+        </p>
+      </div>
+      <div class="f-links">
+        <a href="index.html">Home</a>
+        <a href="index.html#rounds">Rounds</a>
+        <a href="team.html">Team</a>
+        <a href="register.html">Register</a>
+        <a href="help.html">Help</a>
+      </div>
+      <div class="f-social">
+        <a href="https://instagram.com" target="_blank" rel="noopener">Instagram</a>
+        <a href="https://linkedin.com" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="mailto:aigenxclub@example.edu">Email</a>
+      </div>
+    </div>
+    <div class="f-bottom">
+      <span>&copy; <span class="year">2026</span> AI GenX Club. All rights reserved.</span>
+      <span>CLEARANCE GATEWAY ACTIVE</span>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/matrix.js"></script>
+  <script src="js/three-bg.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
