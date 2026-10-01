@@ -3,7 +3,7 @@ import mediaManager from '../utils/MediaController';
 
 export default function Hero({ onRegisterClick }) {
   const [timeLeft, setTimeLeft] = useState({ days: '00', hours: '00', mins: '00', secs: '00' });
-  const [isVideoMuted, setIsVideoMuted] = useState(false);
+  const [isVideoMuted, setIsVideoMuted] = useState(true);
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -163,6 +163,9 @@ export default function Hero({ onRegisterClick }) {
               autoPlay
               muted={isVideoMuted}
               playsInline
+              webkit-playsinline="true"
+              loop
+              preload="auto"
               className="cyber-video-element"
             />
 

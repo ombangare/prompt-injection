@@ -264,6 +264,9 @@ export default function TeamPage() {
           autoPlay
           muted={isVideoMuted}
           playsInline
+          webkit-playsinline="true"
+          loop
+          preload="auto"
           className="cyber-video-element"
         />
       </div>

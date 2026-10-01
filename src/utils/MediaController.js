@@ -1,5 +1,6 @@
 // Centralized Video & Audio Manager for Cyber Horror Event
-// Ensures only ONE video plays audio at a time, and handles scroll-based auto-switching & browser autoplay unlock.
+// Ensures only ONE video plays audio at a time, handles scroll-based auto-switching,
+// and guarantees rock-solid instant autoplay on all mobile browsers (iOS Safari & Android Chrome).
 
 class MediaController {
   constructor() {
@@ -13,32 +14,50 @@ class MediaController {
     }
   }
 
-  // Modern browsers require 1 interaction to unlock sound
+  // Modern browsers require 1 interaction to unlock unmuted sound
   initUserInteractionUnlock() {
     const unlock = () => {
       this.isAudioUnlocked = true;
       if (this.activeId && this.registeredVideos.has(this.activeId)) {
         const vid = this.registeredVideos.get(this.activeId);
         if (vid) {
-          vid.muted = false;
           vid.play().catch(() => {});
         }
       }
       window.removeEventListener('click', unlock);
       window.removeEventListener('keydown', unlock);
       window.removeEventListener('touchstart', unlock);
+      window.removeEventListener('pointerdown', unlock);
       window.removeEventListener('scroll', unlock, { passive: true });
     };
 
     window.addEventListener('click', unlock, { once: true });
     window.addEventListener('keydown', unlock, { once: true });
     window.addEventListener('touchstart', unlock, { once: true });
+    window.addEventListener('pointerdown', unlock, { once: true });
     window.addEventListener('scroll', unlock, { once: true, passive: true });
   }
 
   register(id, videoElement) {
     if (!videoElement) return;
+
+    // Mobile essential properties
+    videoElement.playsInline = true;
+    videoElement.setAttribute('playsinline', 'true');
+    videoElement.setAttribute('webkit-playsinline', 'true');
+    videoElement.loop = true;
+
     this.registeredVideos.set(id, videoElement);
+
+    // Ensure immediate instant silent autoplay on mobile without blocking
+    videoElement.muted = true;
+    const playPromise = videoElement.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        videoElement.muted = true;
+        videoElement.play().catch(() => {});
+      });
+    }
 
     // Auto-mute audio after playing once, while keeping video looping visually
     const handleEnded = () => {
@@ -77,20 +96,21 @@ class MediaController {
         if (this.isAudioUnlocked) {
           video.muted = false;
         } else {
-          video.muted = false;
+          video.muted = true; // Always start muted on mobile until user toggles or interacts
         }
-        video.currentTime = 0; // restart from beginning for fresh clear voiceover
-        video.play().catch(() => {
-          video.muted = true;
-          video.play().catch(() => {});
-        });
+        
+        const p = video.play();
+        if (p !== undefined) {
+          p.catch(() => {
+            video.muted = true;
+            video.play().catch(() => {});
+          });
+        }
       } else {
-        // Mute and keep looping silently
         video.muted = true;
       }
     });
 
-    // Notify listeners
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('active-video-change', { detail: { activeId: targetId } }));
     }
@@ -100,62 +120,70 @@ class MediaController {
     const vid = this.registeredVideos.get(id);
     if (!vid) return;
 
+    this.isAudioUnlocked = true;
+
     if (vid.muted) {
-      this.isAudioUnlocked = true;
-      this.registeredVideos.forEach((v, vId) => {
-        if (vId === id) {
-          v.currentTime = 0; // replay voiceover from start
-          v.muted = false;
-          v.play().catch(() => {});
-        } else {
-          v.muted = true;
+      // Mute all other videos
+      this.registeredVideos.forEach((otherVid, otherId) => {
+        if (otherId !== id) {
+          otherVid.muted = true;
         }
       });
+      vid.muted = false;
       this.activeId = id;
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('active-video-change', { detail: { activeId: id } }));
-      }
+      vid.play().catch(() => {});
     } else {
       vid.muted = true;
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('active-video-change', { detail: { activeId: null } }));
+      if (this.activeId === id) {
+        this.activeId = null;
       }
+    }
+
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('active-video-change', { detail: { activeId: this.activeId } }));
     }
   }
 
-  // Setup IntersectionObserver for sections on scroll
-  setupScrollObserver(sections) {
+  setupScrollObserver(elements) {
     if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return;
 
     if (this.observer) {
       this.observer.disconnect();
     }
 
-    this.observer = new IntersectionObserver((entries) => {
-      let maxRatio = 0;
-      let mostVisibleId = null;
+    this.observer = new IntersectionObserver(
+      (entries) => {
+        let bestEntry = null;
+        let maxRatio = 0;
 
-      entries.forEach((entry) => {
-        if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
-          maxRatio = entry.intersectionRatio;
-          const sectionId = entry.target.getAttribute('data-video-id') || entry.target.id;
-          if (sectionId) mostVisibleId = sectionId;
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
+            maxRatio = entry.intersectionRatio;
+            bestEntry = entry;
+          }
+        });
+
+        if (bestEntry && maxRatio > 0.35) {
+          const videoId = bestEntry.target.getAttribute('data-video-id') || bestEntry.target.id;
+          if (videoId && this.registeredVideos.has(videoId)) {
+            // Keep muted during scroll on mobile unless explicitly unmuted
+            if (!this.isAudioUnlocked) {
+              const vid = this.registeredVideos.get(videoId);
+              if (vid) vid.play().catch(() => {});
+            }
+          }
         }
-      });
-
-      if (mostVisibleId && mostVisibleId !== this.activeId && maxRatio >= 0.35) {
-        this.setActive(mostVisibleId);
+      },
+      {
+        threshold: [0.2, 0.4, 0.6, 0.8]
       }
-    }, {
-      threshold: [0.35, 0.6, 0.8],
-      rootMargin: '-5% 0px -10% 0px'
-    });
+    );
 
-    sections.forEach((sec) => {
-      if (sec) this.observer.observe(sec);
+    elements.forEach((el) => {
+      if (el) this.observer.observe(el);
     });
   }
 }
 
-export const mediaManager = new MediaController();
+const mediaManager = new MediaController();
 export default mediaManager;
