@@ -65,7 +65,8 @@ export default function Navbar({ activePage, setActivePage }) {
         {/* Mobile Hamburger Button */}
         <button 
           className="nav-toggle" 
-          onClick={() => { playKeyClick(); setMobileMenuOpen(!mobileMenuOpen); }} 
+          type="button"
+          onClick={(e) => { e.preventDefault(); e.stopPropagation(); playKeyClick(); setMobileMenuOpen(!mobileMenuOpen); }} 
           aria-label="Toggle menu"
         >
           {mobileMenuOpen ? '✕' : '☰'}
@@ -75,7 +76,7 @@ export default function Navbar({ activePage, setActivePage }) {
         {mobileMenuOpen && (
           <div 
             className="mobile-nav-backdrop active" 
-            onClick={() => setMobileMenuOpen(false)} 
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setMobileMenuOpen(false); }} 
           />
         )}
 
@@ -89,7 +90,8 @@ export default function Navbar({ activePage, setActivePage }) {
             </div>
             <button 
               className="drawer-close-btn"
-              onClick={() => setMobileMenuOpen(false)}
+              type="button"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setMobileMenuOpen(false); }}
               aria-label="Close menu"
             >
               ✕
@@ -99,33 +101,35 @@ export default function Navbar({ activePage, setActivePage }) {
           <a
             href="#home"
             className={activePage === 'home' ? 'active' : ''}
-            onClick={(e) => { e.preventDefault(); navTo('home'); }}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); navTo('home'); }}
           >
             <span className="nav-num">01 //</span> Home
           </a>
           <a
             href="#terminal"
-            onClick={(e) => { e.preventDefault(); navTo('home', 'terminal'); }}
+            className={activePage === 'home' ? 'active' : ''}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); navTo('home', 'terminal'); }}
           >
             <span className="nav-num">02 //</span> Terminal
           </a>
           <a
             href="#rounds"
-            onClick={(e) => { e.preventDefault(); navTo('home', 'rounds'); }}
+            className={activePage === 'home' ? 'active' : ''}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); navTo('home', 'rounds'); }}
           >
             <span className="nav-num">03 //</span> Rounds
           </a>
           <a
             href="#team"
             className={activePage === 'team' ? 'active' : ''}
-            onClick={(e) => { e.preventDefault(); navTo('team'); }}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); navTo('team'); }}
           >
             <span className="nav-num">04 //</span> Team
           </a>
           <a
             href="#help"
             className={activePage === 'help' ? 'active' : ''}
-            onClick={(e) => { e.preventDefault(); navTo('help'); }}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); navTo('help'); }}
           >
             <span className="nav-num">05 //</span> Help
           </a>
@@ -133,6 +137,7 @@ export default function Navbar({ activePage, setActivePage }) {
           {/* Desktop HUD Controls */}
           <div className="nav-controls desktop-hud">
             <button
+              type="button"
               onClick={handleAudioToggle}
               className={`hud-btn ${audioActive ? 'active' : ''}`}
               title="Toggle Audio Synthesizer"
@@ -142,6 +147,7 @@ export default function Navbar({ activePage, setActivePage }) {
             </button>
 
             <button
+              type="button"
               onClick={handleCrtToggle}
               className={`hud-btn ${crtActive ? 'active' : ''}`}
               title="Toggle CRT Scanlines Filter"
@@ -153,7 +159,7 @@ export default function Navbar({ activePage, setActivePage }) {
           <a
             href="#register"
             className={`cta ${activePage === 'register' ? 'active' : ''}`}
-            onClick={(e) => { e.preventDefault(); navTo('register'); }}
+            onClick={(e) => { e.preventDefault(); e.stopPropagation(); navTo('register'); }}
           >
             ⚡ Register For Round 1 &rarr;
           </a>
@@ -161,7 +167,8 @@ export default function Navbar({ activePage, setActivePage }) {
           {/* Mobile Sound & CRT Controls in Drawer */}
           <div className="mobile-drawer-controls">
             <button
-              onClick={handleAudioToggle}
+              type="button"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAudioToggle(); }}
               className={`hud-btn ${audioActive ? 'active' : ''}`}
               style={{ flex: 1, padding: '8px 10px', fontSize: '0.72rem' }}
             >
@@ -169,7 +176,8 @@ export default function Navbar({ activePage, setActivePage }) {
               <span>{audioActive ? 'AUDIO: ON' : 'AUDIO: OFF'}</span>
             </button>
             <button
-              onClick={handleCrtToggle}
+              type="button"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleCrtToggle(); }}
               className={`hud-btn ${crtActive ? 'active' : ''}`}
               style={{ flex: 1, padding: '8px 10px', fontSize: '0.72rem' }}
             >

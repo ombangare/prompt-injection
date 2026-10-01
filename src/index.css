@@ -392,10 +392,12 @@ main, header.site-nav, footer.site-footer, .biohazard-bar, .page-head {
     display: block;
     position: fixed;
     inset: 0;
+    width: 100vw;
+    height: 100vh;
     background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-    z-index: 9998;
+    z-index: 99998;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
@@ -427,9 +429,10 @@ main, header.site-nav, footer.site-footer, .biohazard-bar, .page-head {
     gap: 0.6rem;
     transform: translateX(100%);
     transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    z-index: 9999;
+    z-index: 99999;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    pointer-events: auto;
   }
 
   .nav-links.open {
@@ -443,21 +446,24 @@ main, header.site-nav, footer.site-footer, .biohazard-bar, .page-head {
     padding-bottom: 0.8rem;
     margin-bottom: 0.4rem;
     border-bottom: 1px solid var(--line-blood);
+    pointer-events: auto;
   }
 
   .drawer-close-btn {
     background: rgba(255, 31, 31, 0.12);
     border: 1px solid var(--line-blood);
     color: var(--red);
-    width: 34px;
-    height: 34px;
+    width: 38px;
+    height: 38px;
     border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
+    font-size: 1.1rem;
     cursor: pointer;
     transition: all 0.2s;
+    pointer-events: auto;
+    touch-action: manipulation;
   }
 
   .drawer-close-btn:hover {
@@ -478,14 +484,18 @@ main, header.site-nav, footer.site-footer, .biohazard-bar, .page-head {
     align-items: center;
     gap: 10px;
     padding: 12px 14px;
-    font-size: 0.92rem;
+    font-size: 0.95rem;
     color: #c9cdd4;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.06);
     border-radius: 4px;
     transition: all 0.2s ease;
-    min-height: 46px;
+    min-height: 48px;
+    cursor: pointer;
+    pointer-events: auto;
     touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
   }
 
   .nav-links a:hover,
@@ -506,6 +516,13 @@ main, header.site-nav, footer.site-footer, .biohazard-bar, .page-head {
     margin-top: auto;
     padding-top: 1rem;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
+    pointer-events: auto;
+  }
+
+  .mobile-drawer-controls button {
+    pointer-events: auto;
+    touch-action: manipulation;
+    cursor: pointer;
   }
 }
 
