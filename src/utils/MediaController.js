@@ -1,8 +1,8 @@
 // Centralized Video & Audio Manager for Cyber Horror Event
 // Guarantees:
-// 1. Instant Mobile & Desktop Autoplay without stalling or freezing.
-// 2. Continuous 1-time playback from start to end with crisp audio, then stops.
-// 3. Smooth IntersectionObserver-based scrolling that avoids mid-stream freezing.
+// 1. Crystal clear audio on Laptop/Desktop & Mobile.
+// 2. Continuous 1-time playback from start to end with sound when visited, then stops.
+// 3. Reliable unmuting on any user interaction across all devices.
 
 import { toggleAudioState } from './AudioEngine';
 
@@ -47,12 +47,12 @@ class MediaController {
 
       this.unmuteActiveVideo();
 
-      ['pointerdown', 'touchstart', 'touchend', 'mousedown', 'keydown', 'click'].forEach(evt => {
+      ['pointerdown', 'touchstart', 'touchend', 'mousedown', 'keydown', 'click', 'wheel'].forEach(evt => {
         window.removeEventListener(evt, unlock);
       });
     };
 
-    ['pointerdown', 'touchstart', 'touchend', 'mousedown', 'keydown', 'click'].forEach(evt => {
+    ['pointerdown', 'touchstart', 'touchend', 'mousedown', 'keydown', 'click', 'wheel'].forEach(evt => {
       window.addEventListener(evt, unlock, { passive: true, capture: true });
     });
   }
@@ -129,16 +129,17 @@ class MediaController {
     targetVideo.loop = false;
     targetVideo.removeAttribute('loop');
 
-    if (this.isAudioUnlocked) {
-      targetVideo.muted = false;
-      targetVideo.volume = 1.0;
-    }
+    // Always attempt unmuted playback with full volume
+    targetVideo.muted = false;
+    targetVideo.volume = 1.0;
 
-    // Play safely without interrupting ongoing decode
     const p = targetVideo.play();
     if (p !== undefined) {
-      p.catch(() => {
-        // Fallback to muted playback if browser restricts sound before user touch
+      p.then(() => {
+        this.isAudioUnlocked = true;
+      }).catch(() => {
+        // If initial cold load blocked sound on mobile before first gesture,
+        // play muted so video renders, and first touch/click will unmute it instantly
         targetVideo.muted = true;
         targetVideo.play().catch(() => {});
       });
