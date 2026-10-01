@@ -51,26 +51,6 @@ export default function Navbar({ activePage, setActivePage }) {
           <span className="dot">&gt;</span>PROMPT<span style={{ color: 'var(--ink-faint)' }}>://</span>INJECTION
         </div>
 
-        {/* HUD Controls */}
-        <div className="nav-controls">
-          <button
-            onClick={handleAudioToggle}
-            className={`hud-btn ${audioActive ? 'active' : ''}`}
-            title="Toggle Audio Synthesizer"
-          >
-            <div className="eq-bars"><span></span><span></span><span></span></div>
-            <span>{audioActive ? 'SOUND: ONLINE' : 'SOUND: MUTED'}</span>
-          </button>
-
-          <button
-            onClick={handleCrtToggle}
-            className={`hud-btn ${crtActive ? 'active' : ''}`}
-            title="Toggle CRT Scanlines Filter"
-          >
-            <span>{crtActive ? 'CRT: ON' : 'CRT: OFF'}</span>
-          </button>
-        </div>
-
         {/* Mobile Hamburger Button */}
         <button 
           className="nav-toggle" 
@@ -88,7 +68,7 @@ export default function Navbar({ activePage, setActivePage }) {
           />
         )}
 
-        {/* Navigation Links / Mobile Drawer */}
+        {/* Navigation Links & Controls */}
         <nav className={`nav-links ${mobileMenuOpen ? 'open' : ''}`}>
           {/* Mobile Drawer Header */}
           <div className="mobile-drawer-header">
@@ -116,33 +96,53 @@ export default function Navbar({ activePage, setActivePage }) {
             href="#terminal"
             onClick={(e) => { e.preventDefault(); navTo('home', 'terminal'); }}
           >
-            <span className="nav-num">02 //</span> Terminal Bug Hunt
+            <span className="nav-num">02 //</span> Terminal
           </a>
           <a
             href="#rounds"
             onClick={(e) => { e.preventDefault(); navTo('home', 'rounds'); }}
           >
-            <span className="nav-num">03 //</span> 3 Challenge Rounds
+            <span className="nav-num">03 //</span> Rounds
           </a>
           <a
             href="#team"
             className={activePage === 'team' ? 'active' : ''}
             onClick={(e) => { e.preventDefault(); navTo('team'); }}
           >
-            <span className="nav-num">04 //</span> Core Command Team
+            <span className="nav-num">04 //</span> Team
           </a>
           <a
             href="#help"
             className={activePage === 'help' ? 'active' : ''}
             onClick={(e) => { e.preventDefault(); navTo('help'); }}
           >
-            <span className="nav-num">05 //</span> Help &amp; FAQ
+            <span className="nav-num">05 //</span> Help
           </a>
+
+          {/* Desktop HUD Controls */}
+          <div className="nav-controls desktop-hud">
+            <button
+              onClick={handleAudioToggle}
+              className={`hud-btn ${audioActive ? 'active' : ''}`}
+              title="Toggle Audio Synthesizer"
+            >
+              <div className="eq-bars"><span></span><span></span><span></span></div>
+              <span>{audioActive ? 'AUDIO: ON' : 'AUDIO: OFF'}</span>
+            </button>
+
+            <button
+              onClick={handleCrtToggle}
+              className={`hud-btn ${crtActive ? 'active' : ''}`}
+              title="Toggle CRT Scanlines Filter"
+            >
+              <span>{crtActive ? 'CRT: ON' : 'CRT: OFF'}</span>
+            </button>
+          </div>
+
           <a
             href="#register"
             className={`cta ${activePage === 'register' ? 'active' : ''}`}
             onClick={(e) => { e.preventDefault(); navTo('register'); }}
-            style={{ marginTop: '0.5rem', textAlign: 'center', width: '100%', padding: '0.9em 1.2em' }}
           >
             ⚡ Register For Round 1 &rarr;
           </a>

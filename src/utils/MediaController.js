@@ -54,16 +54,6 @@ class MediaController {
 
     this.registeredVideos.set(id, videoElement);
 
-    // Ensure immediate instant silent autoplay on mobile without blocking
-    videoElement.muted = true;
-    const playPromise = videoElement.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(() => {
-        videoElement.muted = true;
-        videoElement.play().catch(() => {});
-      });
-    }
-
     // Auto-mute audio after playing once, while keeping video looping visually
     const handleEnded = () => {
       videoElement.muted = true;
@@ -77,7 +67,7 @@ class MediaController {
     videoElement.addEventListener('ended', handleEnded);
 
     // Initial check: if hero or first registered, set as active
-    if (!this.activeId) {
+    if (!this.activeId || id === 'hero') {
       this.setActive(id);
     }
   }
@@ -98,15 +88,14 @@ class MediaController {
 
     this.registeredVideos.forEach((video, id) => {
       if (id === targetId) {
-        if (this.isAudioUnlocked) {
-          video.muted = false;
-        } else {
-          video.muted = true; // Always start muted on mobile until user toggles or interacts
-        }
+        // Attempt unmuted play for 1 time
+        video.muted = false;
+        video.volume = 1.0;
         
         const p = video.play();
         if (p !== undefined) {
           p.catch(() => {
+            // If browser blocks unmuted audio on first load, play muted until user touches screen
             video.muted = true;
             video.play().catch(() => {});
           });

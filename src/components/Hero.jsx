@@ -156,42 +156,6 @@ export default function Hero({ onRegisterClick }) {
               {isVideoMuted ? '🔇 UNMUTE AUDIO' : '🔊 AUDIO LIVE'}
             </button>
 
-            {/* Center Tap to Unmute Overlay when Muted */}
-            {isVideoMuted && (
-              <div 
-                onClick={toggleVideoSound}
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  zIndex: 8,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: 'rgba(0,0,0,0.3)',
-                  cursor: 'pointer'
-                }}
-              >
-                <div style={{
-                  background: 'rgba(255, 31, 31, 0.3)',
-                  border: '1px solid var(--red)',
-                  backdropFilter: 'blur(8px)',
-                  padding: '10px 18px',
-                  borderRadius: '24px',
-                  color: '#fff',
-                  fontSize: '0.82rem',
-                  fontWeight: 700,
-                  letterSpacing: '0.08em',
-                  boxShadow: '0 0 25px var(--red-glow)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}>
-                  <span className="pulse" style={{ width: '8px', height: '8px', background: 'var(--red)', borderRadius: '50%' }}></span>
-                  🔊 TAP TO UNMUTE HORROR AUDIO
-                </div>
-              </div>
-            )}
-
             {/* Video Player with Watermark-free Cropping */}
             <video
               ref={videoRef}

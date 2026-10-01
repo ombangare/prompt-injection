@@ -264,42 +264,6 @@ export default function RegisterPage({ onHelpClick }) {
               {isVideoMuted ? '🔇 UNMUTE' : '🔊 LIVE'}
             </button>
 
-            {/* Center Tap to Unmute Overlay when Muted */}
-            {isVideoMuted && (
-              <div 
-                onClick={toggleVideoSound}
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  zIndex: 8,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: 'rgba(0,0,0,0.3)',
-                  cursor: 'pointer'
-                }}
-              >
-                <div style={{
-                  background: 'rgba(255, 31, 31, 0.3)',
-                  border: '1px solid var(--red)',
-                  backdropFilter: 'blur(8px)',
-                  padding: '6px 12px',
-                  borderRadius: '20px',
-                  color: '#fff',
-                  fontSize: '0.75rem',
-                  fontWeight: 700,
-                  letterSpacing: '0.08em',
-                  boxShadow: '0 0 20px var(--red-glow)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}>
-                  <span className="pulse" style={{ width: '6px', height: '6px', background: 'var(--red)', borderRadius: '50%' }}></span>
-                  🔊 TAP TO UNMUTE
-                </div>
-              </div>
-            )}
-
             <video
               ref={videoRef}
               src="/assets/register.mp4"
