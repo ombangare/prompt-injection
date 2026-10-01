@@ -1,37 +1,46 @@
 // Centralized Video & Audio Manager for Cyber Horror Event
-// Flow:
-// 1. Initial Site Load: ONLY Welcome (Hero) video plays audio for 1 time, then automatically mutes & loops.
-// 2. Scroll Down / Tap "Open Terminal": Terminal video plays audio for 1 time, then automatically mutes & loops.
-// 3. Scroll Down / Tap "Rounds": Rounds video plays audio for 1 time, then automatically mutes & loops.
-// 4. Tap "Team": Team video plays audio for 1 time, then automatically mutes & loops.
-// 5. Tap "Registration": Register video plays audio for 1 time, then automatically mutes & loops.
-// 6. Submit Registration: Confirmation video plays audio for 1 time, then automatically mutes & loops.
+// Bulletproof, simple, rock-solid flow:
+// 1. Initial Page Load: Welcome (Hero) video plays audio for 1 time, then mutes and loops silently.
+// 2. Scroll Down / Tap "Open Terminal": Terminal video plays audio for 1 time, then mutes and loops silently.
+// 3. Scroll Down / Tap "Rounds": Rounds video plays audio for 1 time, then mutes and loops silently.
+// 4. Tap "Team": Team video plays audio for 1 time, then mutes and loops silently.
+// 5. Tap "Registration": Register video plays audio for 1 time, then mutes and loops silently.
+// 6. Submit Registration: Confirmation video plays audio for 1 time, then mutes and loops silently.
 
 class MediaController {
   constructor() {
     this.registeredVideos = new Map(); // id -> HTMLVideoElement
     this.activeId = 'hero';
     this.isAudioUnlocked = false;
-    this.playedAudioSet = new Set();
-    this.observer = null;
-    this.userHasScrolled = false;
+    this.hasPlayedAudio = {
+      hero: false,
+      terminal: false,
+      rounds: false,
+      team: false,
+      register: false,
+      access_granted: false
+    };
 
     if (typeof window !== 'undefined') {
       this.initUserInteractionUnlock();
+      this.initScrollTracker();
     }
   }
 
   initUserInteractionUnlock() {
     const unlock = () => {
       this.isAudioUnlocked = true;
+      // Immediately play audio for the current active video if it hasn't completed its audio run
       if (this.activeId && this.registeredVideos.has(this.activeId)) {
-        const vid = this.registeredVideos.get(this.activeId);
-        if (vid && !this.playedAudioSet.has(this.activeId)) {
-          vid.muted = false;
-          vid.volume = 1.0;
-          vid.play().catch(() => {});
-          if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('active-video-change', { detail: { activeId: this.activeId } }));
+        if (!this.hasPlayedAudio[this.activeId]) {
+          const vid = this.registeredVideos.get(this.activeId);
+          if (vid) {
+            vid.muted = false;
+            vid.volume = 1.0;
+            vid.play().catch(() => {});
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('active-video-change', { detail: { activeId: this.activeId } }));
+            }
           }
         }
       }
@@ -59,13 +68,13 @@ class MediaController {
 
     this.registeredVideos.set(id, videoElement);
 
-    // Smooth auto-mute when video finishes 1 full cycle
+    // Track audio duration & auto-mute when 1 cycle finishes
     let lastTime = 0;
     const handleTimeUpdate = () => {
       if (!videoElement.muted && videoElement.duration > 0) {
-        if (videoElement.currentTime < lastTime || videoElement.currentTime >= videoElement.duration - 0.35) {
+        if (videoElement.currentTime < lastTime || videoElement.currentTime >= videoElement.duration - 0.3) {
           videoElement.muted = true;
-          this.playedAudioSet.add(id);
+          this.hasPlayedAudio[id] = true;
           if (typeof window !== 'undefined') {
             window.dispatchEvent(new CustomEvent('active-video-change', { detail: { activeId: null } }));
           }
@@ -76,7 +85,7 @@ class MediaController {
 
     videoElement.addEventListener('timeupdate', handleTimeUpdate);
 
-    // Initial load: ONLY hero is allowed to play audio
+    // Initial site open: play hero with audio
     if (id === 'hero') {
       this.playAudioOnce('hero');
     } else {
@@ -97,7 +106,7 @@ class MediaController {
 
     this.registeredVideos.forEach((video, id) => {
       if (id === targetId) {
-        if (!this.playedAudioSet.has(targetId)) {
+        if (!this.hasPlayedAudio[targetId]) {
           video.muted = false;
           video.volume = 1.0;
         } else {
@@ -107,7 +116,7 @@ class MediaController {
         const p = video.play();
         if (p !== undefined) {
           p.catch(() => {
-            // Browser restricted initial unmuted playback
+            // Browser restricted initial unmuted playback until touch
             video.muted = true;
             video.play().catch(() => {});
           });
@@ -141,11 +150,11 @@ class MediaController {
       vid.muted = false;
       vid.volume = 1.0;
       this.activeId = id;
-      this.playedAudioSet.delete(id);
+      this.hasPlayedAudio[id] = false; // allow full playback again on manual unmute
       vid.play().catch(() => {});
     } else {
       vid.muted = true;
-      this.playedAudioSet.add(id);
+      this.hasPlayedAudio[id] = true;
       if (this.activeId === id) {
         this.activeId = null;
       }
@@ -156,53 +165,50 @@ class MediaController {
     }
   }
 
-  setupScrollObserver(elements) {
-    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return;
+  initScrollTracker() {
+    let scrollTimeout = null;
 
-    if (this.observer) {
-      this.observer.disconnect();
-    }
+    const checkScrollSection = () => {
+      // Only track scroll on home page
+      const heroEl = document.getElementById('hero');
+      const termEl = document.getElementById('terminal');
+      const roundsEl = document.getElementById('rounds');
 
-    // Mark that user scrolled before triggering other section audios
-    const onFirstScroll = () => {
-      if (window.scrollY > 80) {
-        this.userHasScrolled = true;
+      if (!heroEl && !termEl && !roundsEl) return;
+
+      const scrollPos = window.scrollY + window.innerHeight * 0.45;
+
+      let currentSection = 'hero';
+      if (roundsEl && scrollPos >= roundsEl.offsetTop) {
+        currentSection = 'rounds';
+      } else if (termEl && scrollPos >= termEl.offsetTop) {
+        currentSection = 'terminal';
+      } else {
+        currentSection = 'hero';
+      }
+
+      if (this.activeId !== currentSection) {
+        // Only play audio if this section hasn't played its 1-time audio yet
+        if (!this.hasPlayedAudio[currentSection]) {
+          this.playAudioOnce(currentSection);
+        } else {
+          // Keep activeId updated and keep other videos muted
+          this.activeId = currentSection;
+          this.registeredVideos.forEach((vid, id) => {
+            if (id !== currentSection) vid.muted = true;
+          });
+        }
       }
     };
-    window.addEventListener('scroll', onFirstScroll, { passive: true });
 
-    this.observer = new IntersectionObserver(
-      (entries) => {
-        // Do not auto-switch to lower sections until user has actually scrolled down
-        if (!this.userHasScrolled && window.scrollY < 80) {
-          return;
-        }
+    window.addEventListener('scroll', () => {
+      if (scrollTimeout) clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(checkScrollSection, 80);
+    }, { passive: true });
+  }
 
-        let bestEntry = null;
-        let maxRatio = 0;
-
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
-            maxRatio = entry.intersectionRatio;
-            bestEntry = entry;
-          }
-        });
-
-        if (bestEntry && maxRatio >= 0.45) {
-          const videoId = bestEntry.target.getAttribute('data-video-id') || bestEntry.target.id;
-          if (videoId && this.registeredVideos.has(videoId) && this.activeId !== videoId) {
-            this.playAudioOnce(videoId);
-          }
-        }
-      },
-      {
-        threshold: [0.3, 0.5, 0.7]
-      }
-    );
-
-    elements.forEach((el) => {
-      if (el) this.observer.observe(el);
-    });
+  setupScrollObserver() {
+    // Scroll tracker is initialized in constructor
   }
 }
 
