@@ -27,23 +27,35 @@ class MediaController {
     }
   }
 
+  getCenterVisibleSection() {
+    if (typeof window === 'undefined') return 'hero';
+    if (window.scrollY < 120) return 'hero';
+
+    const viewportCenter = window.innerHeight / 2;
+    const sections = ['rounds', 'terminal', 'hero'];
+
+    for (const id of sections) {
+      const el = document.getElementById(id);
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        if (rect.top <= viewportCenter && rect.bottom >= viewportCenter) {
+          return id;
+        }
+      }
+    }
+    return window.scrollY < 200 ? 'hero' : null;
+  }
+
   initUserInteractionUnlock() {
     const unlock = () => {
       this.isAudioUnlocked = true;
-      // Immediately play audio for the current active video if it hasn't completed its audio run
-      if (this.activeId && this.registeredVideos.has(this.activeId)) {
-        if (!this.hasPlayedAudio[this.activeId]) {
-          const vid = this.registeredVideos.get(this.activeId);
-          if (vid) {
-            vid.muted = false;
-            vid.volume = 1.0;
-            vid.play().catch(() => {});
-            if (typeof window !== 'undefined') {
-              window.dispatchEvent(new CustomEvent('active-video-change', { detail: { activeId: this.activeId } }));
-            }
-          }
-        }
+      const current = this.getCenterVisibleSection() || this.activeId || 'hero';
+      const vid = this.registeredVideos.get(current);
+
+      if (vid && !this.hasPlayedAudio[current]) {
+        this.playAudioOnce(current);
       }
+
       window.removeEventListener('click', unlock);
       window.removeEventListener('keydown', unlock);
       window.removeEventListener('touchstart', unlock);
@@ -69,10 +81,9 @@ class MediaController {
     this.registeredVideos.set(id, videoElement);
 
     // Track audio duration & auto-mute when 1 cycle finishes
-    let lastTime = 0;
     const handleTimeUpdate = () => {
-      if (!videoElement.muted && videoElement.duration > 0) {
-        if (videoElement.currentTime < lastTime || videoElement.currentTime >= videoElement.duration - 0.3) {
+      if (!videoElement.muted && videoElement.duration > 1) {
+        if (videoElement.currentTime >= videoElement.duration - 0.45) {
           videoElement.muted = true;
           this.hasPlayedAudio[id] = true;
           if (typeof window !== 'undefined') {
@@ -80,7 +91,6 @@ class MediaController {
           }
         }
       }
-      lastTime = videoElement.currentTime;
     };
 
     videoElement.addEventListener('timeupdate', handleTimeUpdate);
@@ -169,23 +179,8 @@ class MediaController {
     let scrollTimeout = null;
 
     const checkScrollSection = () => {
-      // Only track scroll on home page
-      const heroEl = document.getElementById('hero');
-      const termEl = document.getElementById('terminal');
-      const roundsEl = document.getElementById('rounds');
-
-      if (!heroEl && !termEl && !roundsEl) return;
-
-      const scrollPos = window.scrollY + window.innerHeight * 0.45;
-
-      let currentSection = 'hero';
-      if (roundsEl && scrollPos >= roundsEl.offsetTop) {
-        currentSection = 'rounds';
-      } else if (termEl && scrollPos >= termEl.offsetTop) {
-        currentSection = 'terminal';
-      } else {
-        currentSection = 'hero';
-      }
+      const currentSection = this.getCenterVisibleSection();
+      if (!currentSection) return;
 
       if (this.activeId !== currentSection) {
         // Only play audio if this section hasn't played its 1-time audio yet
@@ -203,12 +198,12 @@ class MediaController {
 
     window.addEventListener('scroll', () => {
       if (scrollTimeout) clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(checkScrollSection, 80);
+      scrollTimeout = setTimeout(checkScrollSection, 60);
     }, { passive: true });
   }
 
   setupScrollObserver() {
-    // Scroll tracker is initialized in constructor
+    // Scroll tracker handles accurate viewport centering
   }
 }
 
