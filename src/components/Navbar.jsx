@@ -19,26 +19,23 @@ export default function Navbar({ activePage, setActivePage }) {
   };
 
   const navTo = (page, anchor) => {
-    setActivePage(page);
     setMobileMenuOpen(false);
     playKeyClick();
+    setActivePage(page);
+
     if (page === 'home' && anchor) {
       setTimeout(() => {
         const el = document.getElementById(anchor);
-        if (el) el.scrollIntoView({ behavior: 'smooth' });
-        mediaManager.playAudioOnce(anchor);
-      }, 60);
-    } else if (page === 'home') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      mediaManager.playAudioOnce('hero');
-    } else if (page === 'team') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      setTimeout(() => mediaManager.playAudioOnce('team'), 100);
-    } else if (page === 'register') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      setTimeout(() => mediaManager.playAudioOnce('register'), 100);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          mediaManager.playAudioOnce(anchor);
+        }
+      }, 120);
     } else {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      if (page === 'home') mediaManager.playAudioOnce('hero');
+      if (page === 'team') mediaManager.playAudioOnce('team');
+      if (page === 'register') mediaManager.playAudioOnce('register');
     }
   };
 
@@ -66,72 +63,46 @@ export default function Navbar({ activePage, setActivePage }) {
         <button 
           className="nav-toggle" 
           type="button"
-          onClick={(e) => { e.preventDefault(); e.stopPropagation(); playKeyClick(); setMobileMenuOpen(!mobileMenuOpen); }} 
+          onClick={() => { playKeyClick(); setMobileMenuOpen(!mobileMenuOpen); }} 
           aria-label="Toggle menu"
         >
           {mobileMenuOpen ? '✕' : '☰'}
         </button>
 
-        {/* Mobile Backdrop Overlay */}
-        {mobileMenuOpen && (
-          <div 
-            className="mobile-nav-backdrop active" 
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); setMobileMenuOpen(false); }} 
-          />
-        )}
-
-        {/* Navigation Links & Controls */}
-        <nav className={`nav-links ${mobileMenuOpen ? 'open' : ''}`}>
-          {/* Mobile Drawer Header */}
-          <div className="mobile-drawer-header">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--red)', fontWeight: 700, letterSpacing: '0.12em' }}>
-              <span className="pulse" style={{ width: '8px', height: '8px', background: 'var(--red)', borderRadius: '50%' }}></span>
-              SYSTEM DIRECTORY
-            </div>
-            <button 
-              className="drawer-close-btn"
-              type="button"
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setMobileMenuOpen(false); }}
-              aria-label="Close menu"
-            >
-              ✕
-            </button>
-          </div>
-
+        {/* Desktop Navigation Links */}
+        <nav className="nav-links">
           <a
             href="#home"
             className={activePage === 'home' ? 'active' : ''}
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); navTo('home'); }}
+            onClick={(e) => { e.preventDefault(); navTo('home'); }}
           >
-            <span className="nav-num">01 //</span> Home
+            Home
           </a>
           <a
             href="#terminal"
-            className={activePage === 'home' ? 'active' : ''}
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); navTo('home', 'terminal'); }}
+            onClick={(e) => { e.preventDefault(); navTo('home', 'terminal'); }}
           >
-            <span className="nav-num">02 //</span> Terminal
+            Terminal
           </a>
           <a
             href="#rounds"
-            className={activePage === 'home' ? 'active' : ''}
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); navTo('home', 'rounds'); }}
+            onClick={(e) => { e.preventDefault(); navTo('home', 'rounds'); }}
           >
-            <span className="nav-num">03 //</span> Rounds
+            Rounds
           </a>
           <a
             href="#team"
             className={activePage === 'team' ? 'active' : ''}
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); navTo('team'); }}
+            onClick={(e) => { e.preventDefault(); navTo('team'); }}
           >
-            <span className="nav-num">04 //</span> Team
+            Team
           </a>
           <a
             href="#help"
             className={activePage === 'help' ? 'active' : ''}
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); navTo('help'); }}
+            onClick={(e) => { e.preventDefault(); navTo('help'); }}
           >
-            <span className="nav-num">05 //</span> Help
+            Help
           </a>
 
           {/* Desktop HUD Controls */}
@@ -159,33 +130,114 @@ export default function Navbar({ activePage, setActivePage }) {
           <a
             href="#register"
             className={`cta ${activePage === 'register' ? 'active' : ''}`}
-            onClick={(e) => { e.preventDefault(); e.stopPropagation(); navTo('register'); }}
+            onClick={(e) => { e.preventDefault(); navTo('register'); }}
           >
             ⚡ Register For Round 1 &rarr;
           </a>
-
-          {/* Mobile Sound & CRT Controls in Drawer */}
-          <div className="mobile-drawer-controls">
-            <button
-              type="button"
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleAudioToggle(); }}
-              className={`hud-btn ${audioActive ? 'active' : ''}`}
-              style={{ flex: 1, padding: '8px 10px', fontSize: '0.72rem' }}
-            >
-              <div className="eq-bars"><span></span><span></span><span></span></div>
-              <span>{audioActive ? 'AUDIO: ON' : 'AUDIO: OFF'}</span>
-            </button>
-            <button
-              type="button"
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleCrtToggle(); }}
-              className={`hud-btn ${crtActive ? 'active' : ''}`}
-              style={{ flex: 1, padding: '8px 10px', fontSize: '0.72rem' }}
-            >
-              <span>{crtActive ? 'CRT: ON' : 'CRT: OFF'}</span>
-            </button>
-          </div>
         </nav>
       </header>
+
+      {/* DEDICATED FULL-SCREEN TOP-LEVEL MOBILE DRAWER PORTAL */}
+      {mobileMenuOpen && (
+        <div className="mobile-drawer-portal">
+          <div 
+            className="mobile-drawer-backdrop" 
+            onClick={() => setMobileMenuOpen(false)} 
+          />
+          <div className="mobile-drawer-panel">
+            <div className="mobile-drawer-header">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.82rem', color: 'var(--red)', fontWeight: 700, letterSpacing: '0.12em' }}>
+                <span className="pulse" style={{ width: '8px', height: '8px', background: 'var(--red)', borderRadius: '50%' }}></span>
+                SYSTEM DIRECTORY
+              </div>
+              <button 
+                className="drawer-close-btn"
+                type="button"
+                onClick={() => setMobileMenuOpen(false)}
+                aria-label="Close menu"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="mobile-drawer-links">
+              <button 
+                type="button"
+                className={`mobile-nav-item ${activePage === 'home' ? 'active' : ''}`}
+                onClick={() => navTo('home')}
+              >
+                <span className="nav-num">01 //</span>
+                <span className="nav-text">Home</span>
+              </button>
+
+              <button 
+                type="button"
+                className="mobile-nav-item"
+                onClick={() => navTo('home', 'terminal')}
+              >
+                <span className="nav-num">02 //</span>
+                <span className="nav-text">Terminal Arena</span>
+              </button>
+
+              <button 
+                type="button"
+                className="mobile-nav-item"
+                onClick={() => navTo('home', 'rounds')}
+              >
+                <span className="nav-num">03 //</span>
+                <span className="nav-text">The 3 Rounds</span>
+              </button>
+
+              <button 
+                type="button"
+                className={`mobile-nav-item ${activePage === 'team' ? 'active' : ''}`}
+                onClick={() => navTo('team')}
+              >
+                <span className="nav-num">04 //</span>
+                <span className="nav-text">The Team</span>
+              </button>
+
+              <button 
+                type="button"
+                className={`mobile-nav-item ${activePage === 'help' ? 'active' : ''}`}
+                onClick={() => navTo('help')}
+              >
+                <span className="nav-num">05 //</span>
+                <span className="nav-text">Support &amp; FAQ</span>
+              </button>
+
+              <button 
+                type="button"
+                className={`mobile-nav-item cta-item ${activePage === 'register' ? 'active' : ''}`}
+                onClick={() => navTo('register')}
+                style={{ marginTop: '8px' }}
+              >
+                <span>⚡ Register For Round 1 &rarr;</span>
+              </button>
+            </div>
+
+            <div className="mobile-drawer-controls">
+              <button
+                type="button"
+                onClick={handleAudioToggle}
+                className={`hud-btn ${audioActive ? 'active' : ''}`}
+                style={{ flex: 1, padding: '10px 8px', fontSize: '0.74rem', justifyContent: 'center' }}
+              >
+                <div className="eq-bars"><span></span><span></span><span></span></div>
+                <span>{audioActive ? 'AUDIO: ON' : 'AUDIO: OFF'}</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleCrtToggle}
+                className={`hud-btn ${crtActive ? 'active' : ''}`}
+                style={{ flex: 1, padding: '10px 8px', fontSize: '0.74rem', justifyContent: 'center' }}
+              >
+                <span>{crtActive ? 'CRT: ON' : 'CRT: OFF'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
