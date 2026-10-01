@@ -1,11 +1,13 @@
 // Centralized Video & Audio Manager for Cyber Horror Event
-// Bulletproof, simple, rock-solid flow:
+// Flow:
 // 1. Initial Page Load: Welcome (Hero) video plays audio for 1 time, then mutes and loops silently.
 // 2. Scroll Down / Tap "Open Terminal": Terminal video plays audio for 1 time, then mutes and loops silently.
 // 3. Scroll Down / Tap "Rounds": Rounds video plays audio for 1 time, then mutes and loops silently.
 // 4. Tap "Team": Team video plays audio for 1 time, then mutes and loops silently.
 // 5. Tap "Registration": Register video plays audio for 1 time, then mutes and loops silently.
 // 6. Submit Registration: Confirmation video plays audio for 1 time, then mutes and loops silently.
+
+import { toggleAudioState } from './AudioEngine';
 
 class MediaController {
   constructor() {
@@ -49,25 +51,39 @@ class MediaController {
   initUserInteractionUnlock() {
     const unlock = () => {
       this.isAudioUnlocked = true;
+
+      // Ensure audio context is online
+      try {
+        toggleAudioState(true);
+      } catch (e) {}
+
       const current = this.getCenterVisibleSection() || this.activeId || 'hero';
       const vid = this.registeredVideos.get(current);
 
       if (vid && !this.hasPlayedAudio[current]) {
-        this.playAudioOnce(current);
+        vid.muted = false;
+        vid.volume = 1.0;
+        const p = vid.play();
+        if (p !== undefined) {
+          p.then(() => {
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('active-video-change', { detail: { activeId: current } }));
+            }
+          }).catch(() => {
+            vid.muted = true;
+            vid.play().catch(() => {});
+          });
+        }
       }
 
-      window.removeEventListener('click', unlock);
-      window.removeEventListener('keydown', unlock);
-      window.removeEventListener('touchstart', unlock);
-      window.removeEventListener('pointerdown', unlock);
-      window.removeEventListener('scroll', unlock, { passive: true });
+      ['pointerdown', 'touchstart', 'mousedown', 'keydown', 'click'].forEach(evt => {
+        window.removeEventListener(evt, unlock);
+      });
     };
 
-    window.addEventListener('click', unlock, { once: true });
-    window.addEventListener('keydown', unlock, { once: true });
-    window.addEventListener('touchstart', unlock, { once: true });
-    window.addEventListener('pointerdown', unlock, { once: true });
-    window.addEventListener('scroll', unlock, { once: true, passive: true });
+    ['pointerdown', 'touchstart', 'mousedown', 'keydown', 'click'].forEach(evt => {
+      window.addEventListener(evt, unlock, { passive: true });
+    });
   }
 
   register(id, videoElement) {
@@ -125,10 +141,17 @@ class MediaController {
 
         const p = video.play();
         if (p !== undefined) {
-          p.catch(() => {
-            // Browser restricted initial unmuted playback until touch
+          p.then(() => {
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('active-video-change', { detail: { activeId: targetId } }));
+            }
+          }).catch(() => {
+            // Browser restricted initial unmuted playback until user touches screen
             video.muted = true;
             video.play().catch(() => {});
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('active-video-change', { detail: { activeId: targetId } }));
+            }
           });
         }
       } else {
