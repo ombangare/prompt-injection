@@ -1,11 +1,12 @@
 // Centralized Video & Audio Manager for Cyber Horror Event
 // Flow:
-// 1. Initial Page Load: Welcome (Hero) video plays audio for 1 time, then mutes and loops silently.
-// 2. Scroll Down / Tap "Open Terminal": Terminal video plays audio for 1 time, then mutes and loops silently.
-// 3. Scroll Down / Tap "Rounds": Rounds video plays audio for 1 time, then mutes and loops silently.
-// 4. Tap "Team": Team video plays audio for 1 time, then mutes and loops silently.
-// 5. Tap "Registration": Register video plays audio for 1 time, then mutes and loops silently.
-// 6. Submit Registration: Confirmation video plays audio for 1 time, then mutes and loops silently.
+// 1. Initial Page Load: Welcome (Hero) video plays with audio 1 time, then stops and stays off.
+// 2. Scroll Down / Tap "Open Terminal": Terminal video plays with audio 1 time, then stops and stays off.
+// 3. Scroll Down / Tap "Rounds": Rounds video plays with audio 1 time, then stops and stays off.
+// 4. Tap "Team": Team video plays with audio 1 time, then stops and stays off.
+// 5. Tap "Registration": Register video plays with audio 1 time, then stops and stays off.
+// 6. Submit Registration: Confirmation video plays with audio 1 time, then stops and stays off.
+// Otherwise all non-active/finished videos remain OFF (paused). Looping is completely disabled.
 
 import { toggleAudioState } from './AudioEngine';
 
@@ -14,7 +15,7 @@ class MediaController {
     this.registeredVideos = new Map(); // id -> HTMLVideoElement
     this.activeId = 'hero';
     this.isAudioUnlocked = false;
-    this.hasPlayedAudio = {
+    this.hasPlayed = {
       hero: false,
       terminal: false,
       rounds: false,
@@ -52,7 +53,7 @@ class MediaController {
     const unlock = () => {
       this.isAudioUnlocked = true;
 
-      // Ensure audio context is online
+      // Ensure Web Audio context is started
       try {
         toggleAudioState(true);
       } catch (e) {}
@@ -60,20 +61,8 @@ class MediaController {
       const current = this.getCenterVisibleSection() || this.activeId || 'hero';
       const vid = this.registeredVideos.get(current);
 
-      if (vid && !this.hasPlayedAudio[current]) {
-        vid.muted = false;
-        vid.volume = 1.0;
-        const p = vid.play();
-        if (p !== undefined) {
-          p.then(() => {
-            if (typeof window !== 'undefined') {
-              window.dispatchEvent(new CustomEvent('active-video-change', { detail: { activeId: current } }));
-            }
-          }).catch(() => {
-            vid.muted = true;
-            vid.play().catch(() => {});
-          });
-        }
+      if (vid && !this.hasPlayed[current]) {
+        this.playAudioOnce(current);
       }
 
       ['pointerdown', 'touchstart', 'mousedown', 'keydown', 'click'].forEach(evt => {
@@ -92,35 +81,46 @@ class MediaController {
     videoElement.playsInline = true;
     videoElement.setAttribute('playsinline', 'true');
     videoElement.setAttribute('webkit-playsinline', 'true');
-    videoElement.loop = true;
+    videoElement.loop = false;
+    videoElement.removeAttribute('loop');
 
     this.registeredVideos.set(id, videoElement);
 
-    // Track audio duration & auto-mute when 1 cycle finishes
+    // Stop and stay off once 1 playthrough finishes
+    const handleEnded = () => {
+      videoElement.pause();
+      this.hasPlayed[id] = true;
+    };
+
     const handleTimeUpdate = () => {
-      if (!videoElement.muted && videoElement.duration > 1) {
-        if (videoElement.currentTime >= videoElement.duration - 0.45) {
-          videoElement.muted = true;
-          this.hasPlayedAudio[id] = true;
-          if (typeof window !== 'undefined') {
-            window.dispatchEvent(new CustomEvent('active-video-change', { detail: { activeId: null } }));
-          }
-        }
+      // Fallback in case ended event is delayed on some browsers
+      if (videoElement.duration > 1 && videoElement.currentTime >= videoElement.duration - 0.2) {
+        videoElement.pause();
+        this.hasPlayed[id] = true;
       }
     };
 
+    videoElement.addEventListener('ended', handleEnded);
     videoElement.addEventListener('timeupdate', handleTimeUpdate);
 
-    // Initial site open: play hero with audio
-    if (id === 'hero') {
+    // When registered:
+    // If it's hero and hasn't played yet, trigger initial playback
+    if (id === 'hero' && !this.hasPlayed.hero) {
       this.playAudioOnce('hero');
+    } else if (id === this.activeId && !this.hasPlayed[id]) {
+      this.playAudioOnce(id);
     } else {
+      // Otherwise keep OFF
+      videoElement.pause();
       videoElement.muted = true;
-      videoElement.play().catch(() => {});
     }
   }
 
   unregister(id) {
+    const vid = this.registeredVideos.get(id);
+    if (vid) {
+      vid.pause();
+    }
     this.registeredVideos.delete(id);
     if (this.activeId === id) {
       this.activeId = null;
@@ -130,72 +130,51 @@ class MediaController {
   playAudioOnce(targetId) {
     this.activeId = targetId;
 
+    // Pause and mute all other videos (otherwise off)
     this.registeredVideos.forEach((video, id) => {
-      if (id === targetId) {
-        if (!this.hasPlayedAudio[targetId]) {
-          video.muted = false;
-          video.volume = 1.0;
-        } else {
-          video.muted = true;
-        }
-
-        const p = video.play();
-        if (p !== undefined) {
-          p.then(() => {
-            if (typeof window !== 'undefined') {
-              window.dispatchEvent(new CustomEvent('active-video-change', { detail: { activeId: targetId } }));
-            }
-          }).catch(() => {
-            // Browser restricted initial unmuted playback until user touches screen
-            video.muted = true;
-            video.play().catch(() => {});
-            if (typeof window !== 'undefined') {
-              window.dispatchEvent(new CustomEvent('active-video-change', { detail: { activeId: targetId } }));
-            }
-          });
-        }
-      } else {
+      if (id !== targetId) {
+        video.pause();
         video.muted = true;
       }
     });
 
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('active-video-change', { detail: { activeId: targetId } }));
+    const targetVideo = this.registeredVideos.get(targetId);
+    if (!targetVideo) return;
+
+    // If it already played its 1-time video, do not re-play, keep off
+    if (this.hasPlayed[targetId]) {
+      targetVideo.pause();
+      return;
+    }
+
+    targetVideo.loop = false;
+    targetVideo.removeAttribute('loop');
+    targetVideo.muted = false;
+    targetVideo.volume = 1.0;
+
+    // Reset to start and play
+    try {
+      targetVideo.currentTime = 0;
+    } catch (e) {}
+
+    const playPromise = targetVideo.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          // Playing successfully with sound
+        })
+        .catch(() => {
+          // If browser restricts unmuted autoplay until user gesture,
+          // mute temporarily and play so video shows initial frame,
+          // then user gesture unlock will start audio playthrough
+          targetVideo.muted = true;
+          targetVideo.play().catch(() => {});
+        });
     }
   }
 
   setActive(targetId) {
     this.playAudioOnce(targetId);
-  }
-
-  toggleMute(id) {
-    const vid = this.registeredVideos.get(id);
-    if (!vid) return;
-
-    this.isAudioUnlocked = true;
-
-    if (vid.muted) {
-      this.registeredVideos.forEach((otherVid, otherId) => {
-        if (otherId !== id) {
-          otherVid.muted = true;
-        }
-      });
-      vid.muted = false;
-      vid.volume = 1.0;
-      this.activeId = id;
-      this.hasPlayedAudio[id] = false; // allow full playback again on manual unmute
-      vid.play().catch(() => {});
-    } else {
-      vid.muted = true;
-      this.hasPlayedAudio[id] = true;
-      if (this.activeId === id) {
-        this.activeId = null;
-      }
-    }
-
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('active-video-change', { detail: { activeId: this.activeId } }));
-    }
   }
 
   initScrollTracker() {
@@ -206,14 +185,14 @@ class MediaController {
       if (!currentSection) return;
 
       if (this.activeId !== currentSection) {
-        // Only play audio if this section hasn't played its 1-time audio yet
-        if (!this.hasPlayedAudio[currentSection]) {
+        if (!this.hasPlayed[currentSection]) {
           this.playAudioOnce(currentSection);
         } else {
-          // Keep activeId updated and keep other videos muted
+          // Section already played: keep previous and current videos paused/off
           this.activeId = currentSection;
-          this.registeredVideos.forEach((vid, id) => {
-            if (id !== currentSection) vid.muted = true;
+          this.registeredVideos.forEach((vid) => {
+            vid.pause();
+            vid.muted = true;
           });
         }
       }
@@ -221,12 +200,8 @@ class MediaController {
 
     window.addEventListener('scroll', () => {
       if (scrollTimeout) clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(checkScrollSection, 60);
+      scrollTimeout = setTimeout(checkScrollSection, 80);
     }, { passive: true });
-  }
-
-  setupScrollObserver() {
-    // Scroll tracker handles accurate viewport centering
   }
 }
 

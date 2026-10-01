@@ -3,7 +3,6 @@ import mediaManager from '../utils/MediaController';
 
 export default function Hero({ onRegisterClick }) {
   const [timeLeft, setTimeLeft] = useState({ days: '00', hours: '00', mins: '00', secs: '00' });
-  const [isVideoMuted, setIsVideoMuted] = useState(true);
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -11,17 +10,8 @@ export default function Hero({ onRegisterClick }) {
       mediaManager.register('hero', videoRef.current);
     }
 
-    const handleVideoChange = () => {
-      if (videoRef.current) {
-        setIsVideoMuted(videoRef.current.muted);
-      }
-    };
-
-    window.addEventListener('active-video-change', handleVideoChange);
-
     return () => {
       mediaManager.unregister('hero');
-      window.removeEventListener('active-video-change', handleVideoChange);
     };
   }, []);
 
@@ -47,13 +37,6 @@ export default function Hero({ onRegisterClick }) {
     const id = setInterval(update, 1000);
     return () => clearInterval(id);
   }, []);
-
-  const toggleVideoSound = () => {
-    mediaManager.toggleMute('hero');
-    if (videoRef.current) {
-      setIsVideoMuted(videoRef.current.muted);
-    }
-  };
 
   const handleDetonation = () => {
     if (window.trigger3DGlitch) window.trigger3DGlitch(3.5);
@@ -134,29 +117,6 @@ export default function Hero({ onRegisterClick }) {
               </span>
             </div>
 
-            {/* Audio Toggle Button */}
-            <button
-              onClick={toggleVideoSound}
-              style={{
-                position: 'absolute',
-                top: '10px',
-                right: '12px',
-                zIndex: 10,
-                background: isVideoMuted ? 'rgba(0,0,0,0.7)' : 'rgba(25, 255, 110, 0.2)',
-                border: isVideoMuted ? '1px solid var(--line-blood)' : '1px solid var(--green)',
-                color: isVideoMuted ? 'var(--red)' : 'var(--green)',
-                padding: '4px 10px',
-                borderRadius: '4px',
-                fontSize: '0.7rem',
-                fontWeight: 700,
-                cursor: 'pointer',
-                letterSpacing: '0.08em',
-                backdropFilter: 'blur(6px)'
-              }}
-            >
-              {isVideoMuted ? '🔇 UNMUTE AUDIO' : '🔊 AUDIO LIVE'}
-            </button>
-
             {/* Video Player with Watermark-free Cropping */}
             <video
               ref={videoRef}
@@ -165,7 +125,6 @@ export default function Hero({ onRegisterClick }) {
               muted
               playsInline
               webkit-playsinline="true"
-              loop
               preload="auto"
               className="cyber-video-element"
             />

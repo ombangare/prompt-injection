@@ -111,7 +111,6 @@ const QUESTION_POOL = [
 
 export default function TerminalCLI({ onNavigate }) {
   const [inputVal, setInputVal] = useState('');
-  const [isVideoMuted, setIsVideoMuted] = useState(true);
   const videoRef = useRef(null);
   const bodyRef = useRef(null);
 
@@ -134,17 +133,8 @@ export default function TerminalCLI({ onNavigate }) {
       mediaManager.register('terminal', videoRef.current);
     }
 
-    const handleVideoChange = () => {
-      if (videoRef.current) {
-        setIsVideoMuted(videoRef.current.muted);
-      }
-    };
-
-    window.addEventListener('active-video-change', handleVideoChange);
-
     return () => {
       mediaManager.unregister('terminal');
-      window.removeEventListener('active-video-change', handleVideoChange);
     };
   }, []);
 
@@ -447,28 +437,6 @@ export default function TerminalCLI({ onNavigate }) {
             </span>
           </div>
 
-          <button
-            onClick={() => mediaManager.toggleMute('terminal')}
-            style={{
-              position: 'absolute',
-              top: '8px',
-              right: '10px',
-              zIndex: 10,
-              background: isVideoMuted ? 'rgba(0,0,0,0.7)' : 'rgba(25, 255, 110, 0.2)',
-              border: isVideoMuted ? '1px solid var(--line-blood)' : '1px solid var(--green)',
-              color: isVideoMuted ? 'var(--red)' : 'var(--green)',
-              padding: '4px 8px',
-              borderRadius: '4px',
-              fontSize: '0.68rem',
-              fontWeight: 700,
-              cursor: 'pointer',
-              letterSpacing: '0.08em',
-              backdropFilter: 'blur(6px)'
-            }}
-          >
-            {isVideoMuted ? '🔇 UNMUTE' : '🔊 LIVE'}
-          </button>
-
           <video
             ref={videoRef}
             src="/assets/terminal.mp4"
@@ -476,7 +444,6 @@ export default function TerminalCLI({ onNavigate }) {
             muted
             playsInline
             webkit-playsinline="true"
-            loop
             preload="auto"
             className="cyber-video-element"
           />

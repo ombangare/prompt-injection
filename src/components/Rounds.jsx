@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import mediaManager from '../utils/MediaController';
 
 export default function Rounds({ onRegisterClick }) {
-  const [isVideoMuted, setIsVideoMuted] = useState(true);
   const [showRound2Modal, setShowRound2Modal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [passData, setPassData] = useState(null);
@@ -14,26 +13,10 @@ export default function Rounds({ onRegisterClick }) {
       mediaManager.register('rounds', videoRef.current);
     }
 
-    const handleVideoChange = () => {
-      if (videoRef.current) {
-        setIsVideoMuted(videoRef.current.muted);
-      }
-    };
-
-    window.addEventListener('active-video-change', handleVideoChange);
-
     return () => {
       mediaManager.unregister('rounds');
-      window.removeEventListener('active-video-change', handleVideoChange);
     };
   }, []);
-
-  const toggleSound = () => {
-    mediaManager.toggleMute('rounds');
-    if (videoRef.current) {
-      setIsVideoMuted(videoRef.current.muted);
-    }
-  };
 
   const handleVerifyRound2 = (e) => {
     e.preventDefault();
@@ -93,28 +76,6 @@ export default function Rounds({ onRegisterClick }) {
           </span>
         </div>
 
-        <button
-          onClick={toggleSound}
-          style={{
-            position: 'absolute',
-            top: '10px',
-            right: '12px',
-            zIndex: 10,
-            background: isVideoMuted ? 'rgba(0,0,0,0.7)' : 'rgba(25, 255, 110, 0.2)',
-            border: isVideoMuted ? '1px solid var(--line-blood)' : '1px solid var(--green)',
-            color: isVideoMuted ? 'var(--red)' : 'var(--green)',
-            padding: '4px 10px',
-            borderRadius: '4px',
-            fontSize: '0.7rem',
-            fontWeight: 700,
-            cursor: 'pointer',
-            letterSpacing: '0.08em',
-            backdropFilter: 'blur(6px)'
-          }}
-        >
-          {isVideoMuted ? '🔇 UNMUTE BRIEFING' : '🔊 BRIEFING LIVE'}
-        </button>
-
         <video
           ref={videoRef}
           src="/assets/rounds.mp4"
@@ -122,7 +83,6 @@ export default function Rounds({ onRegisterClick }) {
           muted
           playsInline
           webkit-playsinline="true"
-          loop
           preload="auto"
           className="cyber-video-element"
         />

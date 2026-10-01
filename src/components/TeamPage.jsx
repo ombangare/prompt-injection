@@ -181,7 +181,6 @@ function PersonCard({ name, role, initials, photo, instagram, linkedin, email })
 }
 
 export default function TeamPage() {
-  const [isVideoMuted, setIsVideoMuted] = useState(false);
   const videoRef = useRef(null);
 
   useEffect(() => {
@@ -190,26 +189,10 @@ export default function TeamPage() {
       mediaManager.setActive('team');
     }
 
-    const handleVideoChange = () => {
-      if (videoRef.current) {
-        setIsVideoMuted(videoRef.current.muted);
-      }
-    };
-
-    window.addEventListener('active-video-change', handleVideoChange);
-
     return () => {
       mediaManager.unregister('team');
-      window.removeEventListener('active-video-change', handleVideoChange);
     };
   }, []);
-
-  const toggleSound = () => {
-    mediaManager.toggleMute('team');
-    if (videoRef.current) {
-      setIsVideoMuted(videoRef.current.muted);
-    }
-  };
 
   return (
     <div className="block" style={{ paddingTop: '40px' }}>
@@ -236,28 +219,6 @@ export default function TeamPage() {
           </span>
         </div>
 
-        <button
-          onClick={toggleSound}
-          style={{
-            position: 'absolute',
-            top: '10px',
-            right: '12px',
-            zIndex: 10,
-            background: isVideoMuted ? 'rgba(0,0,0,0.7)' : 'rgba(25, 255, 110, 0.2)',
-            border: isVideoMuted ? '1px solid var(--line-blood)' : '1px solid var(--green)',
-            color: isVideoMuted ? 'var(--red)' : 'var(--green)',
-            padding: '4px 10px',
-            borderRadius: '4px',
-            fontSize: '0.7rem',
-            fontWeight: 700,
-            cursor: 'pointer',
-            letterSpacing: '0.08em',
-            backdropFilter: 'blur(6px)'
-          }}
-        >
-          {isVideoMuted ? '🔇 UNMUTE FEED' : '🔊 COMMAND FEED LIVE'}
-        </button>
-
         <video
           ref={videoRef}
           src="/assets/team.mp4"
@@ -265,7 +226,6 @@ export default function TeamPage() {
           muted
           playsInline
           webkit-playsinline="true"
-          loop
           preload="auto"
           className="cyber-video-element"
         />
