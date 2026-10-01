@@ -229,7 +229,6 @@ export default function RegisterPage({ onHelpClick }) {
             <video
               ref={videoRef}
               src="/assets/register.mp4"
-              autoPlay
               muted
               playsInline
               webkit-playsinline="true"
@@ -300,7 +299,6 @@ export default function RegisterPage({ onHelpClick }) {
               <video
                 ref={accessGrantedRef}
                 src="/assets/access_granted.mp4"
-                autoPlay
                 muted
                 playsInline
                 webkit-playsinline="true"

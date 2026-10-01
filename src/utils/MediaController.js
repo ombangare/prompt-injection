@@ -1,8 +1,12 @@
 // Centralized Video & Audio Manager for Cyber Horror Event
-// Guarantees:
-// 1. Crystal clear audio on Laptop/Desktop & Mobile.
-// 2. Continuous 1-time playback from start to end with sound when visited, then stops.
-// 3. Reliable unmuting on any user interaction across all devices.
+// Flow:
+// 1. Initial Page Load: Welcome (Hero) video ONLY plays 1 time with audio, then stops.
+// 2. Scroll / Tap "Terminal": Terminal video starts and plays 1 time with audio, then stops.
+// 3. Scroll / Tap "Rounds": Rounds video starts and plays 1 time with audio, then stops.
+// 4. Tap "Team": Team video plays 1 time with audio, then stops.
+// 5. Tap "Registration": Register video plays 1 time with audio, then stops.
+// 6. Submit Registration: Confirmation video plays 1 time with audio, then stops.
+// Non-active videos remain strictly PAUSED. No multiple videos decoding at once.
 
 import { toggleAudioState } from './AudioEngine';
 
@@ -84,13 +88,14 @@ class MediaController {
       videoElement.removeEventListener('ended', handleEnded);
     });
 
-    // Start playing if it's the active video and has not completed its cycle
-    if (id === this.activeId && !this.hasPlayed[id]) {
-      this.playAudioOnce(id);
-    } else if (id === 'hero' && !this.hasPlayed.hero) {
+    // ONLY hero starts on initial load. All other videos stay paused until visited/scrolled
+    if (id === 'hero' && !this.hasPlayed.hero) {
       this.playAudioOnce('hero');
-    } else if (this.hasPlayed[id]) {
+    } else if (id === this.activeId && !this.hasPlayed[id]) {
+      this.playAudioOnce(id);
+    } else {
       videoElement.pause();
+      videoElement.muted = true;
     }
   }
 
@@ -110,7 +115,7 @@ class MediaController {
   playAudioOnce(targetId) {
     this.activeId = targetId;
 
-    // Pause all other videos
+    // Pause all other videos completely so only 1 video runs at a time
     this.registeredVideos.forEach((video, id) => {
       if (id !== targetId) {
         video.pause();
@@ -129,7 +134,7 @@ class MediaController {
     targetVideo.loop = false;
     targetVideo.removeAttribute('loop');
 
-    // Always attempt unmuted playback with full volume
+    // Attempt unmuted play with full volume
     targetVideo.muted = false;
     targetVideo.volume = 1.0;
 
@@ -138,8 +143,7 @@ class MediaController {
       p.then(() => {
         this.isAudioUnlocked = true;
       }).catch(() => {
-        // If initial cold load blocked sound on mobile before first gesture,
-        // play muted so video renders, and first touch/click will unmute it instantly
+        // Fallback to muted playback if mobile security policy blocked cold audio before touch
         targetVideo.muted = true;
         targetVideo.play().catch(() => {});
       });
@@ -160,7 +164,7 @@ class MediaController {
     this.scrollObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.4) {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.35) {
             const sectionId = entry.target.getAttribute('data-video-id') || entry.target.id;
             if (sectionId && this.activeId !== sectionId) {
               if (!this.hasPlayed[sectionId]) {
@@ -176,8 +180,8 @@ class MediaController {
         });
       },
       {
-        threshold: [0.4, 0.6],
-        rootMargin: '0px 0px -15% 0px'
+        threshold: [0.35, 0.6],
+        rootMargin: '0px 0px -10% 0px'
       }
     );
 

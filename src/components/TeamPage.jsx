@@ -224,7 +224,6 @@ export default function TeamPage() {
         <video
           ref={videoRef}
           src="/assets/team.mp4"
-          autoPlay
           muted
           playsInline
           webkit-playsinline="true"

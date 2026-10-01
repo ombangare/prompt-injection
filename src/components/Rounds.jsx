@@ -79,7 +79,6 @@ export default function Rounds({ onRegisterClick }) {
         <video
           ref={videoRef}
           src="/assets/rounds.mp4"
-          autoPlay
           muted
           playsInline
           webkit-playsinline="true"
