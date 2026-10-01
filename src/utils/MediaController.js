@@ -21,7 +21,12 @@ class MediaController {
       if (this.activeId && this.registeredVideos.has(this.activeId)) {
         const vid = this.registeredVideos.get(this.activeId);
         if (vid) {
+          vid.muted = false;
+          vid.volume = 1.0;
           vid.play().catch(() => {});
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('active-video-change', { detail: { activeId: this.activeId } }));
+          }
         }
       }
       window.removeEventListener('click', unlock);
