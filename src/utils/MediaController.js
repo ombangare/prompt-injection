@@ -1,16 +1,20 @@
 // Centralized Video & Audio Manager for Cyber Horror Event
-// Guarantees:
-// 1. All videos loop smoothly with zero stutter, lag, or freezing.
-// 2. Plays with sound for 1 cycle when opened or scrolled to, then automatically mutes and continues looping silently.
-// 3. Strict guard prevents repeated restarts during scrolling.
+// Flow:
+// 1. Initial Site Load: ONLY Welcome (Hero) video plays audio for 1 time, then automatically mutes & loops.
+// 2. Scroll Down / Tap "Open Terminal": Terminal video plays audio for 1 time, then automatically mutes & loops.
+// 3. Scroll Down / Tap "Rounds": Rounds video plays audio for 1 time, then automatically mutes & loops.
+// 4. Tap "Team": Team video plays audio for 1 time, then automatically mutes & loops.
+// 5. Tap "Registration": Register video plays audio for 1 time, then automatically mutes & loops.
+// 6. Submit Registration: Confirmation video plays audio for 1 time, then automatically mutes & loops.
 
 class MediaController {
   constructor() {
     this.registeredVideos = new Map(); // id -> HTMLVideoElement
-    this.activeId = null;
+    this.activeId = 'hero';
     this.isAudioUnlocked = false;
-    this.playedAudioSet = new Set(); // tracks sections that already completed their audio cycle
+    this.playedAudioSet = new Set();
     this.observer = null;
+    this.userHasScrolled = false;
 
     if (typeof window !== 'undefined') {
       this.initUserInteractionUnlock();
@@ -59,8 +63,7 @@ class MediaController {
     let lastTime = 0;
     const handleTimeUpdate = () => {
       if (!videoElement.muted && videoElement.duration > 0) {
-        // Detect loop cycle completion or end threshold
-        if (videoElement.currentTime < lastTime || videoElement.currentTime >= videoElement.duration - 0.25) {
+        if (videoElement.currentTime < lastTime || videoElement.currentTime >= videoElement.duration - 0.35) {
           videoElement.muted = true;
           this.playedAudioSet.add(id);
           if (typeof window !== 'undefined') {
@@ -73,18 +76,12 @@ class MediaController {
 
     videoElement.addEventListener('timeupdate', handleTimeUpdate);
 
-    // Start video playing immediately
-    const playPromise = videoElement.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(() => {
-        videoElement.muted = true;
-        videoElement.play().catch(() => {});
-      });
-    }
-
-    // If hero or first registered, set as active
-    if (!this.activeId || id === 'hero') {
-      this.setActive(id);
+    // Initial load: ONLY hero is allowed to play audio
+    if (id === 'hero') {
+      this.playAudioOnce('hero');
+    } else {
+      videoElement.muted = true;
+      videoElement.play().catch(() => {});
     }
   }
 
@@ -95,15 +92,11 @@ class MediaController {
     }
   }
 
-  setActive(targetId) {
-    // STRICT GUARD: If already active, NEVER interrupt or reset video playback
-    if (this.activeId === targetId) return;
-
+  playAudioOnce(targetId) {
     this.activeId = targetId;
 
     this.registeredVideos.forEach((video, id) => {
       if (id === targetId) {
-        // Only unmute if it hasn't completed its 1 audio cycle yet
         if (!this.playedAudioSet.has(targetId)) {
           video.muted = false;
           video.volume = 1.0;
@@ -114,13 +107,12 @@ class MediaController {
         const p = video.play();
         if (p !== undefined) {
           p.catch(() => {
-            // If browser blocks unmuted audio on load, play muted smoothly
+            // Browser restricted initial unmuted playback
             video.muted = true;
             video.play().catch(() => {});
           });
         }
       } else {
-        // Mute non-active videos while keeping them looping visually
         video.muted = true;
       }
     });
@@ -128,6 +120,10 @@ class MediaController {
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('active-video-change', { detail: { activeId: targetId } }));
     }
+  }
+
+  setActive(targetId) {
+    this.playAudioOnce(targetId);
   }
 
   toggleMute(id) {
@@ -145,7 +141,7 @@ class MediaController {
       vid.muted = false;
       vid.volume = 1.0;
       this.activeId = id;
-      this.playedAudioSet.delete(id); // allow audio again on manual toggle
+      this.playedAudioSet.delete(id);
       vid.play().catch(() => {});
     } else {
       vid.muted = true;
@@ -167,8 +163,21 @@ class MediaController {
       this.observer.disconnect();
     }
 
+    // Mark that user scrolled before triggering other section audios
+    const onFirstScroll = () => {
+      if (window.scrollY > 80) {
+        this.userHasScrolled = true;
+      }
+    };
+    window.addEventListener('scroll', onFirstScroll, { passive: true });
+
     this.observer = new IntersectionObserver(
       (entries) => {
+        // Do not auto-switch to lower sections until user has actually scrolled down
+        if (!this.userHasScrolled && window.scrollY < 80) {
+          return;
+        }
+
         let bestEntry = null;
         let maxRatio = 0;
 
@@ -179,15 +188,15 @@ class MediaController {
           }
         });
 
-        if (bestEntry && maxRatio > 0.35) {
+        if (bestEntry && maxRatio >= 0.45) {
           const videoId = bestEntry.target.getAttribute('data-video-id') || bestEntry.target.id;
           if (videoId && this.registeredVideos.has(videoId) && this.activeId !== videoId) {
-            this.setActive(videoId);
+            this.playAudioOnce(videoId);
           }
         }
       },
       {
-        threshold: [0.2, 0.4, 0.6, 0.8]
+        threshold: [0.3, 0.5, 0.7]
       }
     );
 

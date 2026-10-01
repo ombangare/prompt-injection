@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { toggleAudioState, playKeyClick } from '../utils/AudioEngine';
+import mediaManager from '../utils/MediaController';
 
 export default function Navbar({ activePage, setActivePage }) {
   const [audioActive, setAudioActive] = useState(true);
@@ -21,11 +22,21 @@ export default function Navbar({ activePage, setActivePage }) {
     setActivePage(page);
     setMobileMenuOpen(false);
     playKeyClick();
-    if (anchor) {
+    if (page === 'home' && anchor) {
       setTimeout(() => {
         const el = document.getElementById(anchor);
         if (el) el.scrollIntoView({ behavior: 'smooth' });
-      }, 50);
+        mediaManager.playAudioOnce(anchor);
+      }, 60);
+    } else if (page === 'home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      mediaManager.playAudioOnce('hero');
+    } else if (page === 'team') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => mediaManager.playAudioOnce('team'), 100);
+    } else if (page === 'register') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => mediaManager.playAudioOnce('register'), 100);
     } else {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }

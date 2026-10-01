@@ -110,6 +110,7 @@ export default function Hero({ onRegisterClick }) {
               href="#terminal"
               onClick={(e) => {
                 e.preventDefault();
+                mediaManager.playAudioOnce('terminal');
                 document.getElementById('terminal')?.scrollIntoView({ behavior: 'smooth' });
               }}
               className="btn btn-ghost"
