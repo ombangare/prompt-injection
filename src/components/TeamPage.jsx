@@ -184,6 +184,8 @@ export default function TeamPage() {
   const videoRef = useRef(null);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+
     if (videoRef.current) {
       mediaManager.register('team', videoRef.current);
       mediaManager.setActive('team');

@@ -18,6 +18,8 @@ export default function RegisterPage({ onHelpClick }) {
   const accessGrantedRef = useRef(null);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+
     if (videoRef.current) {
       mediaManager.register('register', videoRef.current);
       mediaManager.setActive('register');

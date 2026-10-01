@@ -6,13 +6,13 @@
 // 4. Tap "Team": Team video plays with audio 1 time, then stops and stays off.
 // 5. Tap "Registration": Register video plays with audio 1 time, then stops and stays off.
 // 6. Submit Registration: Confirmation video plays with audio 1 time, then stops and stays off.
-// Otherwise all non-active/finished videos remain OFF (paused). Looping is completely disabled.
 
 import { toggleAudioState } from './AudioEngine';
 
 class MediaController {
   constructor() {
     this.registeredVideos = new Map(); // id -> HTMLVideoElement
+    this.cleanupHandlers = new Map(); // id -> function
     this.activeId = 'hero';
     this.isAudioUnlocked = false;
     this.hasPlayed = {
@@ -53,16 +53,22 @@ class MediaController {
     const unlock = () => {
       this.isAudioUnlocked = true;
 
-      // Ensure Web Audio context is started
+      // Ensure Web Audio synth engine is active
       try {
         toggleAudioState(true);
       } catch (e) {}
 
+      // If active video is currently playing muted due to initial autoplay restriction, unmute it
       const current = this.getCenterVisibleSection() || this.activeId || 'hero';
       const vid = this.registeredVideos.get(current);
 
       if (vid && !this.hasPlayed[current]) {
-        this.playAudioOnce(current);
+        vid.muted = false;
+        vid.volume = 1.0;
+        const p = vid.play();
+        if (p !== undefined) {
+          p.catch(() => {});
+        }
       }
 
       ['pointerdown', 'touchstart', 'mousedown', 'keydown', 'click'].forEach(evt => {
@@ -78,6 +84,12 @@ class MediaController {
   register(id, videoElement) {
     if (!videoElement) return;
 
+    // Clean up any old listeners for this id
+    if (this.cleanupHandlers.has(id)) {
+      this.cleanupHandlers.get(id)();
+      this.cleanupHandlers.delete(id);
+    }
+
     videoElement.playsInline = true;
     videoElement.setAttribute('playsinline', 'true');
     videoElement.setAttribute('webkit-playsinline', 'true');
@@ -92,31 +104,38 @@ class MediaController {
       this.hasPlayed[id] = true;
     };
 
-    const handleTimeUpdate = () => {
-      // Fallback in case ended event is delayed on some browsers
-      if (videoElement.duration > 1 && videoElement.currentTime >= videoElement.duration - 0.2) {
-        videoElement.pause();
-        this.hasPlayed[id] = true;
+    const handleStalled = () => {
+      // Resume if network or buffer hiccup occurs
+      if (!this.hasPlayed[id] && this.activeId === id) {
+        videoElement.play().catch(() => {});
       }
     };
 
     videoElement.addEventListener('ended', handleEnded);
-    videoElement.addEventListener('timeupdate', handleTimeUpdate);
+    videoElement.addEventListener('stalled', handleStalled);
 
-    // When registered:
-    // If it's hero and hasn't played yet, trigger initial playback
+    this.cleanupHandlers.set(id, () => {
+      videoElement.removeEventListener('ended', handleEnded);
+      videoElement.removeEventListener('stalled', handleStalled);
+    });
+
+    // If hero on site open or active video, trigger playback
     if (id === 'hero' && !this.hasPlayed.hero) {
       this.playAudioOnce('hero');
     } else if (id === this.activeId && !this.hasPlayed[id]) {
       this.playAudioOnce(id);
-    } else {
-      // Otherwise keep OFF
+    } else if (!this.hasPlayed[id]) {
+      // Pause until visited
       videoElement.pause();
-      videoElement.muted = true;
     }
   }
 
   unregister(id) {
+    if (this.cleanupHandlers.has(id)) {
+      this.cleanupHandlers.get(id)();
+      this.cleanupHandlers.delete(id);
+    }
+
     const vid = this.registeredVideos.get(id);
     if (vid) {
       vid.pause();
@@ -130,7 +149,7 @@ class MediaController {
   playAudioOnce(targetId) {
     this.activeId = targetId;
 
-    // Pause and mute all other videos (otherwise off)
+    // Pause all other videos (otherwise off)
     this.registeredVideos.forEach((video, id) => {
       if (id !== targetId) {
         video.pause();
@@ -141,7 +160,7 @@ class MediaController {
     const targetVideo = this.registeredVideos.get(targetId);
     if (!targetVideo) return;
 
-    // If it already played its 1-time video, do not re-play, keep off
+    // If already finished playing once, keep off/paused
     if (this.hasPlayed[targetId]) {
       targetVideo.pause();
       return;
@@ -149,27 +168,32 @@ class MediaController {
 
     targetVideo.loop = false;
     targetVideo.removeAttribute('loop');
+
+    // Attempt unmuted play if audio is unlocked or requested
     targetVideo.muted = false;
     targetVideo.volume = 1.0;
 
-    // Reset to start and play
-    try {
-      targetVideo.currentTime = 0;
-    } catch (e) {}
+    const startPlay = () => {
+      const playPromise = targetVideo.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            // Video is playing smoothly with sound
+          })
+          .catch(() => {
+            // Fallback: If browser restricted unmuted autoplay before first tap,
+            // play muted so video renders first frames, then user tap will unmute
+            targetVideo.muted = true;
+            targetVideo.play().catch(() => {});
+          });
+      }
+    };
 
-    const playPromise = targetVideo.play();
-    if (playPromise !== undefined) {
-      playPromise
-        .then(() => {
-          // Playing successfully with sound
-        })
-        .catch(() => {
-          // If browser restricts unmuted autoplay until user gesture,
-          // mute temporarily and play so video shows initial frame,
-          // then user gesture unlock will start audio playthrough
-          targetVideo.muted = true;
-          targetVideo.play().catch(() => {});
-        });
+    if (targetVideo.readyState >= 2) {
+      startPlay();
+    } else {
+      // Wait for video data to be ready so it doesn't freeze
+      targetVideo.addEventListener('canplay', startPlay, { once: true });
     }
   }
 
@@ -188,7 +212,6 @@ class MediaController {
         if (!this.hasPlayed[currentSection]) {
           this.playAudioOnce(currentSection);
         } else {
-          // Section already played: keep previous and current videos paused/off
           this.activeId = currentSection;
           this.registeredVideos.forEach((vid) => {
             vid.pause();
@@ -202,6 +225,10 @@ class MediaController {
       if (scrollTimeout) clearTimeout(scrollTimeout);
       scrollTimeout = setTimeout(checkScrollSection, 80);
     }, { passive: true });
+  }
+
+  setupScrollObserver() {
+    // Scroll tracker handles accurate viewport centering
   }
 }
 

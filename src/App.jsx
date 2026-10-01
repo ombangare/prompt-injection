@@ -14,14 +14,15 @@ export default function App() {
   const [activePage, setActivePage] = useState('home');
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+
     if (activePage === 'home') {
-      // Allow DOM elements to mount
       const timeout = setTimeout(() => {
         const heroEl = document.getElementById('hero');
         const termEl = document.getElementById('terminal');
         const roundsEl = document.getElementById('rounds');
         mediaManager.setupScrollObserver([heroEl, termEl, roundsEl]);
-      }, 200);
+      }, 150);
 
       return () => clearTimeout(timeout);
     }

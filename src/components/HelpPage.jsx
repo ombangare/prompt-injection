@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { playKeyClick } from '../utils/AudioEngine';
 
 const faqs = [
@@ -30,6 +30,10 @@ const faqs = [
 
 export default function HelpPage() {
   const [openIndex, setOpenIndex] = useState(0);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, []);
 
   const toggleIndex = (idx) => {
     setOpenIndex(openIndex === idx ? -1 : idx);
