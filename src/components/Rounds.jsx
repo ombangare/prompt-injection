@@ -80,6 +80,7 @@ export default function Rounds({ onRegisterClick }) {
           ref={videoRef}
           src="/assets/rounds.mp4"
           autoPlay
+          muted
           playsInline
           webkit-playsinline="true"
           preload="auto"
