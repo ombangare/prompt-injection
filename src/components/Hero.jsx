@@ -161,7 +161,7 @@ export default function Hero({ onRegisterClick }) {
               ref={videoRef}
               src="/assets/welcome.mp4"
               autoPlay
-              muted={isVideoMuted}
+              muted
               playsInline
               webkit-playsinline="true"
               loop

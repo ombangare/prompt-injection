@@ -473,8 +473,11 @@ export default function TerminalCLI({ onNavigate }) {
             ref={videoRef}
             src="/assets/terminal.mp4"
             autoPlay
-            muted={isVideoMuted}
+            muted
             playsInline
+            webkit-playsinline="true"
+            loop
+            preload="auto"
             className="cyber-video-element"
           />
         </div>

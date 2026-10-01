@@ -268,7 +268,7 @@ export default function RegisterPage({ onHelpClick }) {
               ref={videoRef}
               src="/assets/register.mp4"
               autoPlay
-              muted={isVideoMuted}
+              muted
               playsInline
               webkit-playsinline="true"
               loop
