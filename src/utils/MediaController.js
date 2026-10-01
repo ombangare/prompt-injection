@@ -1,6 +1,8 @@
 // Centralized Video & Audio Manager for Cyber Horror Event
-// Ensures only ONE video plays audio at a time, handles scroll-based auto-switching,
-// and guarantees rock-solid instant autoplay on all mobile browsers (iOS Safari & Android Chrome).
+// Guarantees:
+// 1. When opening the site, first video plays with sound 1 time, then automatically mutes & loops.
+// 2. On scroll down, each visible section's video automatically plays with sound 1 time, then automatically mutes & loops.
+// 3. Visiting any page (Team, Register, etc.) automatically plays that video with sound 1 time, then mutes.
 
 class MediaController {
   constructor() {
@@ -14,13 +16,12 @@ class MediaController {
     }
   }
 
-  // Modern browsers require 1 interaction to unlock unmuted sound
   initUserInteractionUnlock() {
     const unlock = () => {
       this.isAudioUnlocked = true;
       if (this.activeId && this.registeredVideos.has(this.activeId)) {
         const vid = this.registeredVideos.get(this.activeId);
-        if (vid) {
+        if (vid && vid.muted) {
           vid.muted = false;
           vid.volume = 1.0;
           vid.play().catch(() => {});
@@ -46,17 +47,16 @@ class MediaController {
   register(id, videoElement) {
     if (!videoElement) return;
 
-    // Mobile essential properties
     videoElement.playsInline = true;
     videoElement.setAttribute('playsinline', 'true');
     videoElement.setAttribute('webkit-playsinline', 'true');
-    videoElement.loop = true;
 
     this.registeredVideos.set(id, videoElement);
 
-    // Auto-mute audio after playing once, while keeping video looping visually
     const handleEnded = () => {
+      // Auto-mute audio after playing once, while keeping video looping visually
       videoElement.muted = true;
+      videoElement.loop = true;
       videoElement.play().catch(() => {});
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('active-video-change', { detail: { activeId: null } }));
@@ -84,24 +84,35 @@ class MediaController {
   }
 
   setActive(targetId) {
+    if (this.activeId === targetId && this.registeredVideos.has(targetId)) {
+      const currentVid = this.registeredVideos.get(targetId);
+      if (currentVid && !currentVid.paused && !currentVid.muted) return;
+    }
+
     this.activeId = targetId;
 
     this.registeredVideos.forEach((video, id) => {
       if (id === targetId) {
-        // Attempt unmuted play for 1 time
+        // Reset to beginning to play unmuted audio 1 time
+        video.loop = false;
         video.muted = false;
         video.volume = 1.0;
-        
+        try {
+          video.currentTime = 0;
+        } catch (e) {}
+
         const p = video.play();
         if (p !== undefined) {
           p.catch(() => {
-            // If browser blocks unmuted audio on first load, play muted until user touches screen
+            // If browser autoplay policy restricts sound before interaction, play muted temporarily
             video.muted = true;
+            video.loop = true;
             video.play().catch(() => {});
           });
         }
       } else {
         video.muted = true;
+        video.loop = true;
       }
     });
 
@@ -117,13 +128,13 @@ class MediaController {
     this.isAudioUnlocked = true;
 
     if (vid.muted) {
-      // Mute all other videos
       this.registeredVideos.forEach((otherVid, otherId) => {
         if (otherId !== id) {
           otherVid.muted = true;
         }
       });
       vid.muted = false;
+      vid.volume = 1.0;
       this.activeId = id;
       vid.play().catch(() => {});
     } else {
@@ -159,12 +170,8 @@ class MediaController {
 
         if (bestEntry && maxRatio > 0.35) {
           const videoId = bestEntry.target.getAttribute('data-video-id') || bestEntry.target.id;
-          if (videoId && this.registeredVideos.has(videoId)) {
-            // Keep muted during scroll on mobile unless explicitly unmuted
-            if (!this.isAudioUnlocked) {
-              const vid = this.registeredVideos.get(videoId);
-              if (vid) vid.play().catch(() => {});
-            }
+          if (videoId && this.registeredVideos.has(videoId) && this.activeId !== videoId) {
+            this.setActive(videoId);
           }
         }
       },
