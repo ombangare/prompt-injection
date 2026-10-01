@@ -230,7 +230,6 @@ export default function RegisterPage({ onHelpClick }) {
               ref={videoRef}
               src="/assets/register.mp4"
               autoPlay
-              muted
               playsInline
               webkit-playsinline="true"
               preload="auto"
@@ -303,7 +302,6 @@ export default function RegisterPage({ onHelpClick }) {
                 autoPlay
                 playsInline
                 webkit-playsinline="true"
-                muted
                 className="cyber-video-element"
               />
             </div>

@@ -1,11 +1,8 @@
 // Centralized Video & Audio Manager for Cyber Horror Event
-// Flow:
-// 1. Initial Page Load: Welcome (Hero) video plays with audio 1 time, then stops and stays off.
-// 2. Scroll Down / Tap "Open Terminal": Terminal video plays with audio 1 time, then stops and stays off.
-// 3. Scroll Down / Tap "Rounds": Rounds video plays with audio 1 time, then stops and stays off.
-// 4. Tap "Team": Team video plays with audio 1 time, then stops and stays off.
-// 5. Tap "Registration": Register video plays with audio 1 time, then stops and stays off.
-// 6. Submit Registration: Confirmation video plays with audio 1 time, then stops and stays off.
+// Guarantees:
+// 1. Mobile & Desktop Autoplay: Starts playing automatically on page load.
+// 2. Audio playback: Plays 1 time with sound when visited / scrolled to, then stops and remains off.
+// 3. Robust unlocking: Mobile gesture listener instantly enables audio on first touch/interaction.
 
 import { toggleAudioState } from './AudioEngine';
 
@@ -49,6 +46,20 @@ class MediaController {
     return window.scrollY < 200 ? 'hero' : null;
   }
 
+  unmuteCurrentVideo() {
+    const current = this.getCenterVisibleSection() || this.activeId || 'hero';
+    const vid = this.registeredVideos.get(current);
+
+    if (vid && !this.hasPlayed[current]) {
+      vid.muted = false;
+      vid.volume = 1.0;
+      const p = vid.play();
+      if (p !== undefined) {
+        p.catch(() => {});
+      }
+    }
+  }
+
   initUserInteractionUnlock() {
     const unlock = () => {
       this.isAudioUnlocked = true;
@@ -58,26 +69,16 @@ class MediaController {
         toggleAudioState(true);
       } catch (e) {}
 
-      // If active video is currently playing muted due to initial autoplay restriction, unmute it
-      const current = this.getCenterVisibleSection() || this.activeId || 'hero';
-      const vid = this.registeredVideos.get(current);
+      // Unmute and start sound for the active video on user touch/click/scroll
+      this.unmuteCurrentVideo();
 
-      if (vid && !this.hasPlayed[current]) {
-        vid.muted = false;
-        vid.volume = 1.0;
-        const p = vid.play();
-        if (p !== undefined) {
-          p.catch(() => {});
-        }
-      }
-
-      ['pointerdown', 'touchstart', 'mousedown', 'keydown', 'click'].forEach(evt => {
+      ['pointerdown', 'touchstart', 'touchend', 'mousedown', 'keydown', 'click', 'scroll'].forEach(evt => {
         window.removeEventListener(evt, unlock);
       });
     };
 
-    ['pointerdown', 'touchstart', 'mousedown', 'keydown', 'click'].forEach(evt => {
-      window.addEventListener(evt, unlock, { passive: true });
+    ['pointerdown', 'touchstart', 'touchend', 'mousedown', 'keydown', 'click', 'scroll'].forEach(evt => {
+      window.addEventListener(evt, unlock, { passive: true, capture: true });
     });
   }
 
@@ -105,7 +106,6 @@ class MediaController {
     };
 
     const handleStalled = () => {
-      // Resume if network or buffer hiccup occurs
       if (!this.hasPlayed[id] && this.activeId === id) {
         videoElement.play().catch(() => {});
       }
@@ -125,7 +125,6 @@ class MediaController {
     } else if (id === this.activeId && !this.hasPlayed[id]) {
       this.playAudioOnce(id);
     } else if (!this.hasPlayed[id]) {
-      // Pause until visited
       videoElement.pause();
     }
   }
@@ -149,7 +148,7 @@ class MediaController {
   playAudioOnce(targetId) {
     this.activeId = targetId;
 
-    // Pause all other videos (otherwise off)
+    // Pause all other videos
     this.registeredVideos.forEach((video, id) => {
       if (id !== targetId) {
         video.pause();
@@ -160,7 +159,7 @@ class MediaController {
     const targetVideo = this.registeredVideos.get(targetId);
     if (!targetVideo) return;
 
-    // If already finished playing once, keep off/paused
+    // If already finished playing once, keep off
     if (this.hasPlayed[targetId]) {
       targetVideo.pause();
       return;
@@ -169,20 +168,32 @@ class MediaController {
     targetVideo.loop = false;
     targetVideo.removeAttribute('loop');
 
-    // Attempt unmuted play if audio is unlocked or requested
-    targetVideo.muted = false;
-    targetVideo.volume = 1.0;
+    // If audio is unlocked or on explicit navigation, try unmuted first
+    if (this.isAudioUnlocked || targetId !== 'hero') {
+      targetVideo.muted = false;
+      targetVideo.volume = 1.0;
+    } else {
+      // For initial site load on mobile, start muted so mobile autoplay never gets blocked
+      targetVideo.muted = true;
+    }
 
     const startPlay = () => {
+      if (targetVideo.currentTime > targetVideo.duration - 0.5) {
+        try { targetVideo.currentTime = 0; } catch (e) {}
+      }
+
       const playPromise = targetVideo.play();
       if (playPromise !== undefined) {
         playPromise
           .then(() => {
-            // Video is playing smoothly with sound
+            // If it started playing and user had already unlocked audio, ensure unmuted
+            if (this.isAudioUnlocked && targetVideo.muted) {
+              targetVideo.muted = false;
+              targetVideo.volume = 1.0;
+            }
           })
-          .catch(() => {
-            // Fallback: If browser restricted unmuted autoplay before first tap,
-            // play muted so video renders first frames, then user tap will unmute
+          .catch((err) => {
+            // Autoplay policy prevented unmuted play, fall back to muted so video plays automatically
             targetVideo.muted = true;
             targetVideo.play().catch(() => {});
           });
@@ -192,8 +203,9 @@ class MediaController {
     if (targetVideo.readyState >= 2) {
       startPlay();
     } else {
-      // Wait for video data to be ready so it doesn't freeze
       targetVideo.addEventListener('canplay', startPlay, { once: true });
+      // Safety trigger in case canplay already fired
+      setTimeout(startPlay, 50);
     }
   }
 

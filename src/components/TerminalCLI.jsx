@@ -441,7 +441,6 @@ export default function TerminalCLI({ onNavigate }) {
             ref={videoRef}
             src="/assets/terminal.mp4"
             autoPlay
-            muted
             playsInline
             webkit-playsinline="true"
             preload="auto"
