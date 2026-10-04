@@ -172,7 +172,7 @@ export function getBackgroundMusic() {
     try {
       bgMusic = new Audio('/assets/Pain.mpeg');
       bgMusic.loop = true;
-      bgMusic.volume = 0.5; // Exactly 50% volume
+      bgMusic.volume = 0.2; // Exactly 20% volume
       bgMusic.preload = 'auto';
     } catch (e) {
       console.warn('Failed to initialize background music', e);
@@ -184,10 +184,10 @@ export function getBackgroundMusic() {
 export function startAmbient() {
   initAudio();
   
-  // Play Pain.mpeg background music at 50% volume
+  // Play Pain.mpeg background music at 20% volume
   const bg = getBackgroundMusic();
   if (bg && !isMuted) {
-    bg.volume = 0.5;
+    bg.volume = 0.2;
     const playPromise = bg.play();
     if (playPromise !== undefined) {
       playPromise.catch(() => {
@@ -280,7 +280,7 @@ export function toggleAudioState(forceState) {
       masterGain.gain.linearRampToValueAtTime(0.4, ctx.currentTime + 0.2);
     }
     if (bg) {
-      bg.volume = 0.5;
+      bg.volume = 0.2;
       bg.play().catch(() => {});
     }
     startAmbient();
