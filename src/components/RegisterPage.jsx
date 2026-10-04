@@ -159,7 +159,7 @@ export default function RegisterPage({ onHelpClick }) {
             <input
               id="fullname"
               type="text"
-              placeholder="e.g. Alex Mercer"
+              placeholder="Enter your full name"
               required
               value={formData.fullname}
               onChange={(e) => setFormData({ ...formData, fullname: e.target.value })}

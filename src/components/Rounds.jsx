@@ -206,7 +206,7 @@ export default function Rounds({ onRegisterClick }) {
                     <input
                       id="verify-query"
                       type="text"
-                      placeholder="e.g. Alex Mercer or +91 9876543210"
+                      placeholder="Enter registered name or WhatsApp number"
                       required
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}

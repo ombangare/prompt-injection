@@ -479,7 +479,7 @@ export default function TerminalCLI({ onNavigate }) {
                 className="term-input"
                 placeholder={
                   gameState.awaitingName
-                    ? "type your name (e.g. Alex / Neo) and press Enter..."
+                    ? "type your name and press Enter..."
                     : gameState.active
                     ? "type '1', '2', or '3'..."
                     : "type 'play', 'details', 'participate'..."
