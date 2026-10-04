@@ -46,7 +46,7 @@ export default function Navbar({ activePage, setActivePage }) {
         <div className="biohazard-track">
           <span>⚠️ BIO-DIGITAL HORROR DETECTED</span>
           <span>• REVERSE PROMPT ENGINEERING • SPEED BUILD SPRINT</span>
-          <span>• AI GENX CLUB PRESENTS: PROMPT://INJECTION 2026</span>
+          <span>• AI GENX CLUB PRESENTS: PROMPT ARENA 2026</span>
           <span>• ON-CAMPUS OFFLINE ISOLATION GRID</span>
           <span>⚠️ DO NOT DISCONNECT UNTIL DECRYPTED</span>
           <span>⚠️ BIO-DIGITAL HORROR DETECTED</span>
@@ -56,7 +56,7 @@ export default function Navbar({ activePage, setActivePage }) {
 
       <header className="site-nav">
         <div className="nav-logo" onClick={() => navTo('home')} style={{ cursor: 'pointer' }}>
-          <span className="dot">&gt;</span>PROMPT<span style={{ color: 'var(--ink-faint)' }}>://</span>INJECTION
+          <span className="dot">&gt;</span>PROMPT<span style={{ color: 'var(--ink-faint)' }}>://</span>ARENA
         </div>
 
         {/* Mobile Hamburger Button */}

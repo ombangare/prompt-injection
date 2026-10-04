@@ -51,7 +51,7 @@ export default function Hero({ onRegisterClick }) {
         <div style={{ textAlign: 'left', minWidth: 0 }}>
           <div className="hero-kicker" style={{ textAlign: 'left' }}>AI GenX Club presents</div>
           <h1 className="hero-title" style={{ textAlign: 'left' }}>
-            <span className="glitch" data-text="PROMPT://INJECTION">PROMPT://INJECTION</span>
+            <span className="glitch" data-text="PROMPT ARENA">PROMPT ARENA</span>
           </h1>
           <p className="hero-sub" style={{ margin: '0 0 1.8rem 0', textAlign: 'left' }}>
             Decode the machine's mind. Then build something a real business could ship.

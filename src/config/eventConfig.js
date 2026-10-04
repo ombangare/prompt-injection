@@ -8,8 +8,7 @@ export const EVENT_CONFIG = {
   // 2. Paste your Official WhatsApp Group invite link here:
   WHATSAPP_GROUP_URL: 'https://chat.whatsapp.com/KC7sl7IXIEF0hxGasxXIPG',
 
-  // Round 1 Details
-  EVENT_NAME: 'PROMPT://INJECTION — AI GenX Flagship',
+  EVENT_NAME: 'Prompt Arena — AI GenX Flagship',
   ROUND_1_NAME: 'Round 1: Online Reverse Prompt Qualifier',
   REGISTRATION_DEADLINE: '07 Oct 2026, 1:00 PM',
   PHOTOS_RELEASE: '07 Oct 2026, 4:00 PM (Online)'

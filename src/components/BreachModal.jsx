@@ -45,13 +45,13 @@ export default function BreachModal({ onEnter }) {
 
         <h1 className="breach-title">WARNING: SYSTEM COMPROMISED</h1>
         <p style={{ color: 'var(--ink-dim)', fontSize: '0.9rem', lineHeight: '1.6' }}>
-          An unauthorized bio-entity has breached the machine. You are now inside the <strong>PROMPT://INJECTION</strong> terminal. Click below to initialize the neural link.
+          An unauthorized bio-entity has breached the machine. You are now inside the <strong>PROMPT ARENA</strong> terminal. Click below to initialize the neural link.
         </p>
 
         <div className="breach-meta">
           <div>INTRUDER_IP: <span className="red">192.0.2.666 [PORT 666 OPEN]</span></div>
           <div>HOST: <span className="green">AI GenX Club Flagship Subsystem</span></div>
-          <div>EVENT_ID: <span className="red">PROMPT://INJECTION (OCT 2026)</span></div>
+          <div>EVENT_ID: <span className="red">PROMPT ARENA (OCT 2026)</span></div>
           <div>DEFENSE_STATUS: <span className="red">CRITICAL BREACH — ENTER AT OWN RISK</span></div>
         </div>
 

@@ -128,11 +128,20 @@ export default function Rounds({ onRegisterClick }) {
           </ul>
 
           <button
-            onClick={() => { setShowRound2Modal(true); setPassData(null); setSearchQuery(''); }}
+            disabled
             className="btn btn-ghost"
-            style={{ width: '100%', marginTop: '1rem', borderColor: 'var(--amber)', color: 'var(--amber)' }}
+            style={{
+              width: '100%',
+              marginTop: '1rem',
+              borderColor: 'rgba(255, 170, 0, 0.3)',
+              color: 'var(--ink-dim)',
+              opacity: 0.65,
+              cursor: 'not-allowed',
+              background: 'rgba(255, 170, 0, 0.03)'
+            }}
+            title="Round 2 verification will be unlocked after Round 1 results"
           >
-            <span>Claim Round 2 Entry Pass 🎫</span>
+            <span>🔒 Pass Verification (Opens Post-Round 1)</span>
           </button>
         </div>
 

@@ -300,7 +300,7 @@ export default function TerminalCLI({ onNavigate }) {
   const showEventDetails = () => {
     setHistory((prev) => [
       ...prev,
-      { text: '================ EVENT DETAILS // PROMPT://INJECTION ================', class: 'accent' },
+      { text: '================ EVENT DETAILS // PROMPT ARENA ================', class: 'accent' },
       { text: 'ORGANIZER: AI GenX Club', class: 'info' },
       { text: 'LAST DAY TO REGISTER: 07 OCT, 1:00 PM', class: 'amber' },
       { text: 'PHOTOS RELEASE: 07 OCT, 4:00 PM', class: 'info' },
@@ -335,7 +335,7 @@ export default function TerminalCLI({ onNavigate }) {
     const raw = cmdText.trim();
     if (!raw) return;
 
-    setHistory((prev) => [...prev, { text: `root@prompt-injection:~# ${cmdText}`, class: 'accent' }]);
+    setHistory((prev) => [...prev, { text: `root@prompt-arena:~# ${cmdText}`, class: 'accent' }]);
 
     // If awaiting player name, record and start game!
     if (gameState.awaitingName) {
@@ -454,7 +454,7 @@ export default function TerminalCLI({ onNavigate }) {
             <div className="terminal-dots">
               <span></span><span></span><span></span>
             </div>
-            <div>root@prompt-injection:~ ({gameState.awaitingName ? 'NAME_REGISTRATION' : gameState.active ? `OPERATIVE: ${gameState.playerName}` : 'BUG_HUNTER_CONSOLE'})</div>
+            <div>root@prompt-arena:~ ({gameState.awaitingName ? 'NAME_REGISTRATION' : gameState.active ? `OPERATIVE: ${gameState.playerName}` : 'BUG_HUNTER_CONSOLE'})</div>
             <div style={{ color: gameState.active ? 'var(--red)' : 'var(--green)' }}>
               {gameState.active ? `[QUESTION ${gameState.currentIndex + 1}/3]` : gameState.awaitingName ? '[WAITING FOR NAME]' : '[SYSTEM IDLE]'}
             </div>
@@ -470,7 +470,7 @@ export default function TerminalCLI({ onNavigate }) {
             </div>
 
             <div className="terminal-input-row">
-              <span className="terminal-prompt">root@prompt-injection:~#</span>
+              <span className="terminal-prompt">root@prompt-arena:~#</span>
               <input
                 type="text"
                 value={inputVal}

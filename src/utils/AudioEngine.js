@@ -98,13 +98,13 @@ export function speakRoboticVoice(text, onEnd) {
   window.speechSynthesis.speak(utterance);
 }
 
-// Initial Auto-Greeting: "Welcome to Prompt Injection"
+// Initial Auto-Greeting: "Welcome to Prompt Arena"
 export function speakHorrorWelcome() {
   initAudio();
   if (ctx && ctx.state === 'suspended') {
     ctx.resume();
   }
-  speakRoboticVoice('Welcome to Prompt Injection. Decode the machine, or be purged.');
+  speakRoboticVoice('Welcome to Prompt Arena. Decode the machine, or be purged.');
   startAmbient();
 }
 

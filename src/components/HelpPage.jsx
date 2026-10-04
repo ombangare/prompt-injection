@@ -3,7 +3,7 @@ import { playKeyClick } from '../utils/AudioEngine';
 
 const faqs = [
   {
-    q: 'What are the key dates and deadlines for PROMPT://INJECTION?',
+    q: 'What are the key dates and deadlines for Prompt Arena?',
     a: '• Registration Deadline: 07 Oct, 1:00 PM\n• Photos Release & Round 1 Start: 07 Oct, 4:00 PM (Online)\n• Round 1 Ends: 08 Oct, 6:00 PM\n• Round 1 Results: 09 Oct, 8:00 PM (Top 30 Shortlisted)\n• Round 2 (In-College Live Build): 10 Oct, 10:00 AM – 1:30 PM (5 Themes Revealed Live)\n• Round 2 Results: 11 Oct, 4:00 PM (Top 10 Shortlisted)\n• Round 3 (Main Event Finals): 12 Oct, 11:00 AM onwards.'
   },
   {
@@ -19,7 +19,7 @@ const faqs = [
     a: 'The Top 10 finalists battle on 12 Oct from 11:00 AM onwards in the main event arena. Finalists will pitch, defend, and live-demo their deployed builds in front of the jury and audience to claim the championship trophies and prizes.'
   },
   {
-    q: 'Who is eligible to participate in PROMPT://INJECTION?',
+    q: 'Who is eligible to participate in Prompt Arena?',
     a: 'Open to all enrolled university and college students across all technical disciplines and academic years. Both beginner prompt enthusiasts and veteran full-stack developers are welcome.'
   },
   {

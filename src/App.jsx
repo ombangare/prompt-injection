@@ -77,7 +77,7 @@ export default function App() {
       <footer className="site-footer">
         <div className="footer-top">
           <div>
-            <div className="f-brand">PROMPT<span style={{ color: 'var(--red)' }}>://</span>INJECTION</div>
+            <div className="f-brand">PROMPT<span style={{ color: 'var(--red)' }}>://</span>ARENA</div>
             <p style={{ color: 'var(--ink-dim)', fontSize: '0.85rem', marginTop: '0.8rem', maxWidth: '320px' }}>
               The ultimate AI prompt decoding and high-velocity web development challenge. Organized by <strong>AI GenX Club</strong>.
             </p>
