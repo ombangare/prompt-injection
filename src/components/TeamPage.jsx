@@ -27,6 +27,7 @@ const technical = [
     initials: 'OB',
     photo: '/assets/team/om.jpg',
     email: 'ombangare469@gmail.com',
+    github: 'https://github.com/ombangare',
     instagram: 'https://www.instagram.com/ombangare_7?stkn=MWFpZzFlcDJzaGVhZQ==',
     linkedin: 'https://in.linkedin.com/in/om-bangare'
   },
@@ -170,9 +171,10 @@ const executives = [
   }
 ];
 
-function PersonCard({ name, role, initials, photo, instagram, linkedin, email, phone }) {
+function PersonCard({ name, role, initials, photo, instagram, linkedin, github, email, phone }) {
   const igUrl = instagram || 'https://instagram.com';
   const liUrl = linkedin || 'https://linkedin.com';
+  const ghUrl = github || null;
   const mailUrl = email ? `mailto:${email}` : null;
   const telUrl = phone ? `tel:${phone.replace(/\s+/g, '')}` : null;
   const waUrl = phone ? `https://wa.me/${phone.replace(/[^0-9]/g, '')}` : null;
@@ -202,6 +204,9 @@ function PersonCard({ name, role, initials, photo, instagram, linkedin, email, p
         <div className="person-links" style={{ marginTop: '6px' }}>
           <a href={igUrl} target="_blank" rel="noreferrer" title="Instagram">IG</a>
           <a href={liUrl} target="_blank" rel="noreferrer" title="LinkedIn">LI</a>
+          {ghUrl && (
+            <a href={ghUrl} target="_blank" rel="noreferrer" title="GitHub Profile">GH</a>
+          )}
           {mailUrl && (
             <a href={mailUrl} title={`Email: ${email}`}>Mail</a>
           )}

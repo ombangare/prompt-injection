@@ -139,13 +139,22 @@ export default function HelpPage() {
           <div style={{ background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--line)', borderRadius: '6px', padding: '14px' }}>
             <div style={{ fontSize: '0.72rem', color: 'var(--green)', fontWeight: 700, letterSpacing: '0.1em' }}>OFFICIAL INQUIRIES</div>
             <div style={{ color: '#fff', fontWeight: 700, fontSize: '1rem', marginTop: '2px' }}>Om Bangare (Technical Head)</div>
-            <div style={{ marginTop: '8px' }}>
+            <div style={{ marginTop: '8px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               <a 
                 href="mailto:ombangare469@gmail.com"
                 className="btn btn-primary"
                 style={{ padding: '6px 14px', fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
               >
                 ✉️ ombangare469@gmail.com
+              </a>
+              <a 
+                href="https://github.com/ombangare"
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-ghost"
+                style={{ padding: '6px 12px', fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              >
+                🐙 GitHub
               </a>
             </div>
           </div>
