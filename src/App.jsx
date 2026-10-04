@@ -9,9 +9,14 @@ import TeamPage from './components/TeamPage';
 import RegisterPage from './components/RegisterPage';
 import HelpPage from './components/HelpPage';
 import mediaManager from './utils/MediaController';
+import { startAmbient } from './utils/AudioEngine';
 
 export default function App() {
   const [activePage, setActivePage] = useState('home');
+
+  useEffect(() => {
+    startAmbient();
+  }, []);
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });

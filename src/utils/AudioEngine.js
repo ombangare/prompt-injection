@@ -163,9 +163,39 @@ export function playDemonicSubRumble() {
 
 export const playLockdownDrop = playDemonicSubRumble;
 
-// 3. Subtle Atmospheric Sub-Drone
+// 3. Background Music (Pain.mpeg) & Atmospheric Ambient
+let bgMusic = null;
+
+export function getBackgroundMusic() {
+  if (typeof window === 'undefined') return null;
+  if (!bgMusic) {
+    try {
+      bgMusic = new Audio('/assets/Pain.mpeg');
+      bgMusic.loop = true;
+      bgMusic.volume = 0.5; // Exactly 50% volume
+      bgMusic.preload = 'auto';
+    } catch (e) {
+      console.warn('Failed to initialize background music', e);
+    }
+  }
+  return bgMusic;
+}
+
 export function startAmbient() {
   initAudio();
+  
+  // Play Pain.mpeg background music at 50% volume
+  const bg = getBackgroundMusic();
+  if (bg && !isMuted) {
+    bg.volume = 0.5;
+    const playPromise = bg.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        // Autoplay policy may require user interaction first
+      });
+    }
+  }
+
   if (!ctx || ambientDrone || isMuted) return;
   try {
     const osc1 = ctx.createOscillator();
@@ -182,7 +212,7 @@ export function startAmbient() {
     filter.type = 'lowpass';
     filter.frequency.setValueAtTime(100, ctx.currentTime);
 
-    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+    gain.gain.setValueAtTime(0.08, ctx.currentTime);
 
     osc1.connect(filter);
     osc2.connect(filter);
@@ -197,6 +227,11 @@ export function startAmbient() {
 }
 
 export function stopAmbient() {
+  const bg = getBackgroundMusic();
+  if (bg) {
+    bg.pause();
+  }
+
   if (!ambientDrone) return;
   try {
     ambientDrone.gain.gain.linearRampToValueAtTime(0.0001, ctx.currentTime + 0.2);
@@ -237,16 +272,25 @@ export function toggleAudioState(forceState) {
 
   isMuted = typeof forceState === 'boolean' ? !forceState : !isMuted;
 
+  const bg = getBackgroundMusic();
+
   if (!isMuted) {
     if (masterGain) {
       masterGain.gain.cancelScheduledValues(ctx.currentTime);
       masterGain.gain.linearRampToValueAtTime(0.4, ctx.currentTime + 0.2);
+    }
+    if (bg) {
+      bg.volume = 0.5;
+      bg.play().catch(() => {});
     }
     startAmbient();
   } else {
     if (masterGain) {
       masterGain.gain.cancelScheduledValues(ctx.currentTime);
       masterGain.gain.linearRampToValueAtTime(0.0001, ctx.currentTime + 0.2);
+    }
+    if (bg) {
+      bg.pause();
     }
     stopAmbient();
   }
