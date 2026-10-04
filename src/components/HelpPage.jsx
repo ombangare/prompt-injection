@@ -61,6 +61,96 @@ export default function HelpPage() {
           </div>
         ))}
       </div>
+
+      {/* Direct Contact & Support Hotline Box */}
+      <div style={{
+        marginTop: '2.5rem',
+        background: 'linear-gradient(135deg, rgba(15, 17, 21, 0.95), rgba(9, 10, 13, 0.98))',
+        border: '1px solid var(--line)',
+        borderLeft: '4px solid var(--green)',
+        borderRadius: '8px',
+        padding: 'clamp(18px, 4vw, 28px)',
+        boxShadow: '0 0 30px rgba(0, 0, 0, 0.5)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--green)', fontSize: '0.78rem', fontWeight: 700, letterSpacing: '0.12em' }}>
+          <span className="pulse" style={{ width: '8px', height: '8px', background: 'var(--green)', borderRadius: '50%' }}></span>
+          DIRECT HOTLINE &amp; EVENT SUPPORT
+        </div>
+        <h3 style={{ color: '#fff', fontSize: '1.35rem', margin: '8px 0 6px 0' }}>Need Immediate Assistance?</h3>
+        <p style={{ color: 'var(--ink-dim)', fontSize: '0.88rem', margin: 0 }}>
+          Reach out directly to the student coordinators or send an official query to the technical team.
+        </p>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 260px), 1fr))',
+          gap: '14px',
+          marginTop: '1.2rem'
+        }}>
+          {/* Coordinator Sakshi */}
+          <div style={{ background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--line)', borderRadius: '6px', padding: '14px' }}>
+            <div style={{ fontSize: '0.72rem', color: 'var(--amber)', fontWeight: 700, letterSpacing: '0.1em' }}>STUDENT COORDINATOR</div>
+            <div style={{ color: '#fff', fontWeight: 700, fontSize: '1rem', marginTop: '2px' }}>Sakshi Pashine</div>
+            <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <a 
+                href="tel:9588435148"
+                className="btn btn-ghost"
+                style={{ padding: '6px 12px', fontSize: '0.78rem', borderColor: 'var(--amber)', color: 'var(--amber)' }}
+              >
+                📞 95884 35148
+              </a>
+              <a 
+                href="https://wa.me/919588435148" 
+                target="_blank" 
+                rel="noreferrer"
+                className="btn btn-green"
+                style={{ padding: '6px 12px', fontSize: '0.78rem' }}
+              >
+                💬 WhatsApp
+              </a>
+            </div>
+          </div>
+
+          {/* Coordinator Kashmira */}
+          <div style={{ background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--line)', borderRadius: '6px', padding: '14px' }}>
+            <div style={{ fontSize: '0.72rem', color: 'var(--amber)', fontWeight: 700, letterSpacing: '0.1em' }}>STUDENT COORDINATOR</div>
+            <div style={{ color: '#fff', fontWeight: 700, fontSize: '1rem', marginTop: '2px' }}>Kashmira Yatawar</div>
+            <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <a 
+                href="tel:8446072268"
+                className="btn btn-ghost"
+                style={{ padding: '6px 12px', fontSize: '0.78rem', borderColor: 'var(--amber)', color: 'var(--amber)' }}
+              >
+                📞 84460 72268
+              </a>
+              <a 
+                href="https://wa.me/918446072268" 
+                target="_blank" 
+                rel="noreferrer"
+                className="btn btn-green"
+                style={{ padding: '6px 12px', fontSize: '0.78rem' }}
+              >
+                💬 WhatsApp
+              </a>
+            </div>
+          </div>
+
+          {/* Official Email / Technical Inquiries */}
+          <div style={{ background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--line)', borderRadius: '6px', padding: '14px' }}>
+            <div style={{ fontSize: '0.72rem', color: 'var(--green)', fontWeight: 700, letterSpacing: '0.1em' }}>OFFICIAL INQUIRIES</div>
+            <div style={{ color: '#fff', fontWeight: 700, fontSize: '1rem', marginTop: '2px' }}>Om Bangare (Technical Head)</div>
+            <div style={{ marginTop: '8px' }}>
+              <a 
+                href="mailto:ombangare469@gmail.com"
+                className="btn btn-primary"
+                style={{ padding: '6px 14px', fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              >
+                ✉️ ombangare469@gmail.com
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

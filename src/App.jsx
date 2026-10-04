@@ -94,10 +94,11 @@ export default function App() {
           </div>
 
           <div className="f-social">
-            <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.85rem', marginBottom: '4px' }}>CONNECT</div>
-            <a href="https://instagram.com" target="_blank" rel="noreferrer">Instagram</a>
-            <a href="https://linkedin.com" target="_blank" rel="noreferrer">LinkedIn</a>
-            <a href="mailto:aigenxclub@example.edu">Email Team</a>
+            <div style={{ color: '#fff', fontWeight: 700, fontSize: '0.85rem', marginBottom: '4px' }}>CONTACT &amp; SUPPORT</div>
+            <a href="mailto:ombangare469@gmail.com">✉️ ombangare469@gmail.com</a>
+            <a href="tel:9588435148">📞 Sakshi: 95884 35148</a>
+            <a href="tel:8446072268">📞 Kashmira: 84460 72268</a>
+            <a href="https://chat.whatsapp.com/KC7sl7IXIEF0hxGasxXIPG" target="_blank" rel="noreferrer" style={{ color: 'var(--green)' }}>💬 Join WhatsApp Group</a>
           </div>
         </div>
 

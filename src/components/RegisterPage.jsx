@@ -260,7 +260,7 @@ export default function RegisterPage({ onHelpClick }) {
           </ul>
 
           <h3 style={{ marginTop: '16px' }}>Need Assistance?</h3>
-          <p style={{ color: 'var(--ink-dim)', fontSize: '.84rem' }}>
+          <p style={{ color: 'var(--ink-dim)', fontSize: '.84rem', lineHeight: '1.6' }}>
             Consult the{' '}
             <a
               href="#help"
@@ -269,8 +269,13 @@ export default function RegisterPage({ onHelpClick }) {
             >
               Support &amp; FAQ
             </a>{' '}
-            or contact student coordinators.
+            or contact Student Coordinators:
           </p>
+          <div style={{ marginTop: '8px', fontSize: '0.8rem', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div>• Sakshi: <a href="tel:9588435148" style={{ color: 'var(--amber)', textDecoration: 'none', fontWeight: 600 }}>95884 35148</a></div>
+            <div>• Kashmira: <a href="tel:8446072268" style={{ color: 'var(--amber)', textDecoration: 'none', fontWeight: 600 }}>84460 72268</a></div>
+            <div>• Email: <a href="mailto:ombangare469@gmail.com" style={{ color: 'var(--green)', textDecoration: 'none' }}>ombangare469@gmail.com</a></div>
+          </div>
         </div>
       </div>
 

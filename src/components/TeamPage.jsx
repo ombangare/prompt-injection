@@ -19,6 +19,7 @@ const technical = [
     role: 'Technical Head',
     initials: 'OB',
     photo: '/assets/team/om.jpg',
+    email: 'ombangare469@gmail.com',
     instagram: 'https://www.instagram.com/ombangare_7?stkn=MWFpZzFlcDJzaGVhZQ==',
     linkedin: 'https://in.linkedin.com/in/om-bangare'
   },
@@ -80,6 +81,7 @@ const coordinators = [
     name: 'Sakshi Pashine',
     role: 'Student Coordinator',
     initials: 'SP',
+    phone: '+91 95884 35148',
     photo: '/assets/team/sakshi.jpg',
     instagram: 'https://www.instagram.com/__.sakshi.__2324?igsi=Z2w1bWhtNzk4dmtq',
     linkedin: 'https://www.linkedin.com/in/sakshi-pashine-27b551383?utm_source=share_via&utm_content=profile&utm_medium=member_android'
@@ -88,6 +90,7 @@ const coordinators = [
     name: 'Kashmira Yatawar',
     role: 'Student Coordinator',
     initials: 'KY',
+    phone: '+91 84460 72268',
     photo: '/assets/team/kashmira.jpg',
     instagram: 'https://www.instagram.com/kashmira_here_',
     linkedin: 'https://www.linkedin.com/in/kashmira-yatawar-791ba5360?utm_source=share_via&utm_content=profile&utm_medium=member_android'
@@ -160,10 +163,12 @@ const executives = [
   }
 ];
 
-function PersonCard({ name, role, initials, photo, instagram, linkedin, email }) {
+function PersonCard({ name, role, initials, photo, instagram, linkedin, email, phone }) {
   const igUrl = instagram || 'https://instagram.com';
   const liUrl = linkedin || 'https://linkedin.com';
-  const mailUrl = email || `mailto:${name.toLowerCase().replace(/\s+/g, '')}@example.edu`;
+  const mailUrl = email ? `mailto:${email}` : null;
+  const telUrl = phone ? `tel:${phone.replace(/\s+/g, '')}` : null;
+  const waUrl = phone ? `https://wa.me/${phone.replace(/[^0-9]/g, '')}` : null;
 
   return (
     <article className="person-card">
@@ -177,10 +182,25 @@ function PersonCard({ name, role, initials, photo, instagram, linkedin, email })
       <div className="person-info">
         <div className="person-name">{name}</div>
         <div className="person-role">{role}</div>
-        <div className="person-links">
-          <a href={igUrl} target="_blank" rel="noreferrer">IG</a>
-          <a href={liUrl} target="_blank" rel="noreferrer">LI</a>
-          <a href={mailUrl}>Mail</a>
+        {phone && (
+          <div style={{ fontSize: '0.76rem', color: 'var(--amber)', margin: '3px 0', fontWeight: 600 }}>
+            📞 <a href={telUrl} style={{ color: 'var(--amber)', textDecoration: 'none' }}>{phone}</a>
+          </div>
+        )}
+        {email && (
+          <div style={{ fontSize: '0.74rem', color: 'var(--green)', margin: '2px 0', wordBreak: 'break-all' }}>
+            ✉️ <a href={mailUrl} style={{ color: 'var(--green)', textDecoration: 'none' }}>{email}</a>
+          </div>
+        )}
+        <div className="person-links" style={{ marginTop: '6px' }}>
+          <a href={igUrl} target="_blank" rel="noreferrer" title="Instagram">IG</a>
+          <a href={liUrl} target="_blank" rel="noreferrer" title="LinkedIn">LI</a>
+          {mailUrl && (
+            <a href={mailUrl} title={`Email: ${email}`}>Mail</a>
+          )}
+          {waUrl && (
+            <a href={waUrl} target="_blank" rel="noreferrer" title="WhatsApp Chat" style={{ color: 'var(--green)' }}>WA</a>
+          )}
         </div>
       </div>
     </article>

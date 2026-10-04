@@ -11,5 +11,11 @@ export const EVENT_CONFIG = {
   EVENT_NAME: 'Prompt Arena — AI GenX Flagship',
   ROUND_1_NAME: 'Round 1: Online Reverse Prompt Qualifier',
   REGISTRATION_DEADLINE: '07 Oct 2026, 1:00 PM',
-  PHOTOS_RELEASE: '07 Oct 2026, 4:00 PM (Online)'
+  PHOTOS_RELEASE: '07 Oct 2026, 4:00 PM (Online)',
+  CONTACT_EMAIL: 'ombangare469@gmail.com',
+  COORDINATORS: [
+    { name: 'Sakshi Pashine', role: 'Student Coordinator', phone: '+91 95884 35148', rawPhone: '9588435148' },
+    { name: 'Kashmira Yatawar', role: 'Student Coordinator', phone: '+91 84460 72268', rawPhone: '8446072268' }
+  ]
 };
+
