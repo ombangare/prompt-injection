@@ -14,7 +14,14 @@ const leadership = [
 ];
 
 const technical = [
-  { name: 'Om', role: 'Technical Head', initials: 'O' },
+  {
+    name: 'Om Bangare',
+    role: 'Technical Head',
+    initials: 'OB',
+    photo: '/assets/team/om.jpg',
+    instagram: 'https://www.instagram.com/ombangare_7?stkn=MWFpZzFlcDJzaGVhZQ==',
+    linkedin: 'https://in.linkedin.com/in/om-bangare'
+  },
   {
     name: 'Harshit Chawla',
     role: 'Technical Executive',
