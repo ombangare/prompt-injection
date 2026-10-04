@@ -2,7 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import mediaManager from '../utils/MediaController';
 
 const leadership = [
-  { name: 'Obaid', role: 'President', initials: 'O' },
+  {
+    name: 'Obaid Sayyed',
+    role: 'President',
+    initials: 'OS',
+    photo: '/assets/team/obaid.jpg',
+    instagram: 'https://www.instagram.com/_01obaid_?stkn=Mms0aGF2NGR2cngx',
+    linkedin: 'https://www.linkedin.com/in/obaid-sayyed-two092006?utm_source=share_via&utm_content=profile&utm_medium=member_android'
+  },
   {
     name: 'Khyati Dutta',
     role: 'Vice President',
